@@ -1,0 +1,59 @@
+<h1 mat-dialog-title>{{ data.type === 'UPDATE' ? 'UPDATE DATA' : 'ADD DATA' }} </h1>
+<br>
+<div mat-dialog-content>
+  <form #form="ngForm" (ngSubmit)="submitForm()">
+    <div class="example-container">
+      <mat-form-field hintLabel="Max 20 characters" appearance="fill">
+        <mat-label>Enter Name</mat-label>
+        <input matInput [(ngModel)]="model.name" name="name" maxlength="30" placeholder="Ex. Haider" required>
+
+      </mat-form-field>
+      <br>
+      <!-- <app-divider></app-divider> -->
+      <mat-form-field hintLabel="Max 20 characters" appearance="fill">
+        <mat-label>Enter Age</mat-label>
+        <input type="number" matInput [(ngModel)]="model.age" name="age" maxlength="20" placeholder="12" required>
+      </mat-form-field>
+      <br>
+      <mat-form-field hintLabel="Max 20 characters" appearance="fill">
+        <mat-label>Enter Team</mat-label>
+        <input type="text" matInput [(ngModel)]="model.team" name="team" maxlength="20" placeholder="Lahore" required>
+      </mat-form-field>
+      <br>
+
+      <!-- nationality -->
+      <mat-form-field hintLabel="Max 20 characters" appearance="fill">
+        <mat-label>Enter Nationality</mat-label>
+        <input type="text" matInput [(ngModel)]="model.nationality" name="nationality" maxlength="20"
+          placeholder="england" required>
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Category</mat-label>
+        <mat-select [(ngModel)]="model.category" name="category">
+          <mat-option *ngFor="let option of PlayerCategory" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-select>
+        <!-- debug button -->
+      </mat-form-field>
+      <br>
+      <mat-form-field appearance="fill">
+        <mat-label>Select Player Type</mat-label>
+        <mat-select [(ngModel)]="model.type" name="type">
+          <mat-option *ngFor="let option of PlayerType" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-select>
+        <!-- debug button -->
+      </mat-form-field>
+    </div>
+  </form>
+
+  <!-- (click)="submitForm()" -->
+  <div mat-dialog-actions>
+    <app-button text={{data.type}} mat-button (click)="submitForm()"></app-button>
+    <app-button text="Cancel" color="" mat-button mat-dialog-close>Cancel</app-button>
+
+  </div>
+</div>
