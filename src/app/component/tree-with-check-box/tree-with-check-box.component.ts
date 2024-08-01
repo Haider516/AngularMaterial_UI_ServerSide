@@ -15,8 +15,10 @@ import { ButtonComponent } from '../button/button.component';
 import { FormsModule } from '@angular/forms';
 import { FormControl } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
-
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { PaginationMeta, PlayersService } from '../../service/players.service';
+import { PSLPlayer, PSLPlayerTree } from '../../playerInterface';
+import { TreeServiceService } from '../../service/tree-service.service';
 
 
 
@@ -53,38 +55,38 @@ export class TodoItemFlatNode {
  * The Json object for to-do list data.
  */
 //
-const usersCV = {
-  cvs: {
-    JohnDoe: {
-      summary: "Experienced software engineer with a passion for developing innovative programs.",
-      experienceJohnDoe: [
-        {
-          company: "Tech Solutions",
-          responsibilities: "Led a team of 10 in developing a new software platform, reducing processing time by 30%."
-        },
-      ]
-    },
-    JaneSmith: {
-      summary: "Results-driven marketing professional with over 10 years of experience in digital marketing.",
-      experienceJaneSmith: [
-        {
-          company: "MarketPro",
-          position: "Marketing Manager",
-        },
+// const usersCV = {
+//   cvs: {
+//     JohnDoe: {
+//       summary: "Experienced software engineer with a passion for developing innovative programs.",
+//       experienceJohnDoe: [
+//         {
+//           company: "Tech Solutions",
+//           responsibilities: "Led a team of 10 in developing a new software platform, reducing processing time by 30%."
+//         },
+//       ]
+//     },
+//     JaneSmith: {
+//       summary: "Results-driven marketing professional with over 10 years of experience in digital marketing.",
+//       experienceJaneSmith: [
+//         {
+//           company: "MarketPro",
+//           position: "Marketing Manager",
+//         },
 
-      ]
-    },
-   
+//       ]
+//     },
 
-  },
-  document: {
-    "sheets": "A4size"
-  },
-  accessories: {
-    "abcd": "jiooo"
-  }
 
-};
+//   },
+//   document: {
+//     "sheets": "A4size"
+//   },
+//   accessories: {
+//     "abcd": "jiooo"
+//   }
+
+// };
 
 /**
  * Checklist database, it can build a tree structured Json object.
@@ -93,22 +95,30 @@ const usersCV = {
  */
 @Injectable()
 export class ChecklistDatabase {
+
+  products: PSLPlayerTree[] = [];
+  pageMeta!: PaginationMeta;
+  
   dataChange = new BehaviorSubject<TodoItemNode[]>([]);
 
   get data(): TodoItemNode[] { return this.dataChange.value; }
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient,private treeService: TreeServiceService) {
     this.initialize();
   }
 
   initialize() {
-    // Build the tree nodes from Json object. The result is a list of `TodoItemNode` with nested
-    //     file node as children
 
+    this.treeService.dataChange.subscribe((data: { players: PSLPlayerTree[]; pagination: PaginationMeta }) => {
+      this.products = data.players;
+      this.pageMeta = data.pagination;
+    });
+    
+    console.log(  this.products,this.pageMeta);
     debugger
-    const data = this.buildFileTree(usersCV, 0);
+    const data = this.buildFileTree(this.products, 0);
     console.log('data', data);
-
+    debugger
     // Notify the change.
     this.dataChange.next(data);
   }
@@ -188,6 +198,7 @@ export class ChecklistDatabase {
   //to update the item value 
 
   updateItemNode(node: TodoItemNode, updateditem: string) {
+    debugger
     node.item = updateditem;
     this.dataChange.next(this.data);
   }
@@ -432,6 +443,7 @@ export class TreeWithCheckBoxComponent {
     const parentNode = this.flatNodeMap.get(node);
 
     debugger
+    
     this._database.insertItem(parentNode!, '');
     this.treeControl.expand(node);
     debugger
@@ -585,7 +597,7 @@ export class TreeWithCheckBoxComponent {
 
   }
 
-  // Reference  parent   node :
+  // Reference  parent   node : 
   getRootNode() {
     console.log(this.treeControl.dataNodes);
     //change
@@ -613,6 +625,7 @@ export class TreeWithCheckBoxComponent {
     return parentNode;
 
   }
+
 
   otherRootNodes(rootNode: TodoItemFlatNode) {
 

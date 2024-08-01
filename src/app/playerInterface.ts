@@ -1,11 +1,23 @@
 export interface PSLPlayer {
-  id?:number;
+  id?: number;
   name: string;
   age: number;
   nationality: string;
   category: PlayerCategory;
   type: PlayerType;
   team: string;
+}
+
+export interface PSLPlayerTree {
+  id?: number;
+  attributes: {
+    name: string;
+    age: number;
+    nationality: string;
+    category: PlayerCategory;
+    type: PlayerType;
+    team: string;
+  }
 }
 
 enum PlayerCategory {
@@ -21,4 +33,12 @@ enum PlayerType {
   Batsman = 'Batsman',
   Wicketkeeper = 'Wicketkeeper',
   AllRounder = 'AllRounder'
+}
+
+
+export interface PaginationMeta {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
 }

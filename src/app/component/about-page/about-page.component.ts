@@ -18,7 +18,7 @@ const HttpOptions = {
 @Component({
   selector: 'app-about-page',
   standalone: true,
-  imports: [TreeWithCheckBoxComponent, PlayerTableComponent, DialogElementsExample],
+  imports: [ PlayerTableComponent, DialogElementsExample],
   templateUrl: './about-page.component.html',
   styleUrl: './about-page.component.css'
 })

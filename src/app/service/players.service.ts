@@ -34,6 +34,8 @@ export interface ApiResponse {
   };
 }
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -124,6 +126,7 @@ export class PlayersService {
 
 
 
+
   //important__________________________________________________________
   //this   is  working fine  and get    all  data player
   // getPlayer(): Observable<PSLPlayer[]> {
@@ -164,7 +167,7 @@ export class PlayersService {
         next: (response) => {
           this.token = response.jwt;
           console.log('Full Response:', response);
-          debugger;
+          
         },
         error: (error) => {
           console.error('Error creating user:', error);
@@ -188,7 +191,7 @@ export class PlayersService {
         next: (response) => {
           this.token = response.jwt;
           console.log('Full Response:', response);
-          debugger;
+          
         },
         error: (error) => {
           console.error('Error logging in user:', error);
@@ -270,16 +273,14 @@ export class PlayersService {
   }
 
   //Re-updating The Data
-  paginationUpdating( page: number, size: number, column: string, direction: string) {
+  paginationUpdating(page: number, size: number, column: string, direction: string) {
     this.paginationData(page, size, column, direction).subscribe((players) => {
       this.dataChange.next(players);
     });
-    debugger
-  }
+      }
 
   paginationData(page: number, size: number, column: string, direction: string): Observable<{ players: PSLPlayer[]; pagination: PaginationMeta }> {
-    debugger
-    return this.http
+        return this.http
       .get<ApiResponse>(`http://localhost:1337/api/psl-players?pagination[page]=${page + 1}&pagination[pageSize]=${size}&pagination[withCount]=true&sort[0]=${column}:${direction}`)
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -323,8 +324,7 @@ export class PlayersService {
   }
 
   filteringData(val: string | number, page: number, size: number, column: string, direction: string) {
-    debugger
-    this.filterData(val, page, size, column, direction).subscribe((players) => {
+        this.filterData(val, page, size, column, direction).subscribe((players) => {
       this.dataChange.next(players);
     });
     return true;
@@ -334,8 +334,7 @@ export class PlayersService {
 
 
   sortData(column: string, direction: string, page: number, pagesize: number) {
-    debugger
-    return this.http
+        return this.http
       .get<ApiResponse>(`http://localhost:1337/api/psl-players?sort[0]=${column}:${direction}&pagination[page]=${page}&pagination[pageSize]=${pagesize}&pagination[withCount]=true`)
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -351,4 +350,10 @@ export class PlayersService {
         this.dataChange.next(players);
       });
   }
+
 }     
+
+
+
+
+// http://localhost:1337/api/psl-players?filters[$or][0][name][$containsi]=${val}&filters[$or][1][age][$containsi]=${val}&filters[$or][2][nationality][$containsi]=${val}&filters[$or][3][category][$containsi]=${val}&filters[$or][4][team][$containsi]=${val}&filters[$or][5][type][$containsi]=${val}&pagination[page]=${page + 1}&pagination[pageSize]=${size}&pagination[withCount]=true&sort[0]=${column}:${direction}`)
