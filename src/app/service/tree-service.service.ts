@@ -21,7 +21,7 @@ interface AuthResponse {
 
 
 export interface ApiResponseTree {
-  data:  PSLPlayerTree[],
+  data: PSLPlayerTree[],
   meta: {
     pagination: PaginationMeta;
   };
@@ -34,9 +34,13 @@ export class TreeServiceService {
 
   error: any | undefined;
   token = "";
-  dataChange = new BehaviorSubject<{ players: PSLPlayerTree[]; pagination: PaginationMeta }>({
-    players: [],
-    pagination: { page: 0, pageSize: 0, pageCount: 0, total: 0 }
+  // dataChange = new BehaviorSubject<{ players: PSLPlayerTree[]; pagination: PaginationMeta }>({
+  //   players: [],
+  //   pagination: { page: 0, pageSize: 0, pageCount: 0, total: 0 }
+  // });
+
+  dataChanges = new BehaviorSubject<{ data: any[] }>({
+    data: [],
   });
 
   constructor(private http: HttpClient) {
@@ -44,22 +48,28 @@ export class TreeServiceService {
   }
 
   initialize() {
-    this.getPlayerTree().subscribe((players) => {
-      this.dataChange.next(players);
+    this.getCustomApiData().subscribe((players) => {
+      this.dataChanges.next({ data: players });
     });
   }
 
+  getCustomApiData(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:1337/api/tree-custom-api').pipe(
+      catchError((error) => this.handleError(error)),
+      map((response: any[]) => {
+        return response;
+      }),
+    );
+  }
 
-
-  getPlayerTree(): Observable<{ players: PSLPlayerTree[]; pagination: PaginationMeta }> {
-    return this.http
-      .get<ApiResponseTree>("http://localhost:1337/api/psl-players?pagination[page]=1&pagination[pageSize]=5&pagination[withCount]=true")
+  getPlayerTree(): Observable<{ players: any[]; pagination: PaginationMeta }> {
+    return this.http.get<ApiResponseTree>("http://localhost:1337/api/nodes?populate=*")
       .pipe(
         catchError((error) => this.handleError(error)),
         map((response: ApiResponseTree) => {
           const players = response.data.map(player => ({
-            ... player
-            
+            ...player
+
           }));
           debugger
           const pagination = response.meta.pagination;
@@ -68,6 +78,104 @@ export class TreeServiceService {
       );
   }
 
+
+  //addNode():Ob
+
+  addNodeService(parent: Number, name: String) {
+    const body = {
+      "data": {
+        "name": name,
+        "parent": parent
+      }
+    };
+    console.log("post", body);
+
+    this.http.post('http://localhost:1337/api/tree-custom-api', body)
+      .pipe(catchError((error) => this.handleError(error)))
+      .subscribe({
+        next: (response) => {
+          console.log("Post", response);
+          // Update the data change subject
+          this.getCustomApiData().subscribe((players) => {
+            this.dataChanges.next({ data: players });
+          });
+        },
+        error: (error) => {
+          console.error('Error posting data:', error);
+        }
+      });
+  }
+
+  deleteNodeService(id: Number) {
+
+    debugger
+    this.http.delete(`http://localhost:1337/api/tree-custom-api/${id}`)
+
+      .pipe(catchError((error) => this.handleError(error)))
+      .subscribe({
+        next: (response) => {
+          console.log("Delte", response);
+          // Update the data change subject
+          this.getCustomApiData().subscribe((players) => {
+            this.dataChanges.next({ data: players });
+          });
+        },
+        error: (error) => {
+          console.error('Error Deleting data:', error);
+        }
+      });
+  }
+
+  updateNodeService(name: String, id: Number) {
+    const body = {
+      "data": {
+        "name": name,
+        "parent": null
+      }
+    };
+    // debugger
+
+    this.http.put(`http://localhost:1337/api/tree-custom-api/${id}`, body)
+      .pipe(catchError((error) => this.handleError(error)))
+      .subscribe({
+        next: (response) => {
+          console.log("update", response);
+          // Update the data change subject
+          this.getCustomApiData().subscribe((players) => {
+            this.dataChanges.next({ data: players });
+          });
+        },
+        error: (error) => {
+          console.error('Error Updating NOde :', error);
+        }
+      });
+  }
+
+  postioning(newParentID: Number, nodeToUpdatedID: Number) {
+
+    const body = {
+      "data": {
+        "parent": newParentID
+      }
+    };
+    debugger
+
+    this.http.put(`http://localhost:1337/api/tree-custom-api/postion/${nodeToUpdatedID}`, body)
+      .pipe(catchError((error) => this.handleError(error)))
+      .subscribe({
+        next: (response) => {
+          console.log("update", response);
+          // Update the data change subject
+          this.getCustomApiData().subscribe((players) => {
+            this.dataChanges.next({ data: players });
+          });
+        },
+        error: (error) => {
+          console.error('Error Updating NOde :', error);
+        }
+      });
+    debugger
+  }
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     this.error = error.message;

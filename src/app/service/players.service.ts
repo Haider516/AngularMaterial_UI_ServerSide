@@ -167,7 +167,7 @@ export class PlayersService {
         next: (response) => {
           this.token = response.jwt;
           console.log('Full Response:', response);
-          
+
         },
         error: (error) => {
           console.error('Error creating user:', error);
@@ -191,7 +191,7 @@ export class PlayersService {
         next: (response) => {
           this.token = response.jwt;
           console.log('Full Response:', response);
-          
+
         },
         error: (error) => {
           console.error('Error logging in user:', error);
@@ -277,10 +277,10 @@ export class PlayersService {
     this.paginationData(page, size, column, direction).subscribe((players) => {
       this.dataChange.next(players);
     });
-      }
+  }
 
   paginationData(page: number, size: number, column: string, direction: string): Observable<{ players: PSLPlayer[]; pagination: PaginationMeta }> {
-        return this.http
+    return this.http
       .get<ApiResponse>(`http://localhost:1337/api/psl-players?pagination[page]=${page + 1}&pagination[pageSize]=${size}&pagination[withCount]=true&sort[0]=${column}:${direction}`)
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -324,7 +324,7 @@ export class PlayersService {
   }
 
   filteringData(val: string | number, page: number, size: number, column: string, direction: string) {
-        this.filterData(val, page, size, column, direction).subscribe((players) => {
+    this.filterData(val, page, size, column, direction).subscribe((players) => {
       this.dataChange.next(players);
     });
     return true;
@@ -334,7 +334,7 @@ export class PlayersService {
 
 
   sortData(column: string, direction: string, page: number, pagesize: number) {
-        return this.http
+    return this.http
       .get<ApiResponse>(`http://localhost:1337/api/psl-players?sort[0]=${column}:${direction}&pagination[page]=${page}&pagination[pageSize]=${pagesize}&pagination[withCount]=true`)
       .pipe(
         catchError((error) => this.handleError(error)),
@@ -351,7 +351,7 @@ export class PlayersService {
       });
   }
 
-}     
+}
 
 
 

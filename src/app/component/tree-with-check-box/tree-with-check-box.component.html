@@ -10,17 +10,7 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   <!-- Node with no content -->
   <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent " matTreeNodePadding>
-    <mat-card class="example-card">
-      <mat-card-content>
-        <button mat-icon-button disabled></button>
-        <mat-form-field>
-          <mat-label>New item...</mat-label>
-          <input matInput #itemValue placeholder="Ex. Lettuce" />
-        </mat-form-field>
-        <app-button [color]="'warn'" [text]="'Add'" mat-button
-          (click)="saveNode(node, itemValue.value)">Save</app-button>
-      </mat-card-content>
-    </mat-card>
+  
   </mat-tree-node>
 
   <!-- Regular node -->
@@ -40,18 +30,14 @@
         <div *ngIf="!node.expandable" class="pad">
 
         </div>
-        {{node.item}}
-        <!-- checkbox removed   -->
-        <!-- <mat-checkbox [checked]="descendantsAllSelected(node)" [indeterminate]="descendantsPartiallySelected(node)"
-          (change)="todoItemSelectionToggle(node)">
-          <mat-card-subtitle> {{node.item}}</mat-card-subtitle>
-        </mat-checkbox> -->
+        {{node.name}}
+      
 
-        <button style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
+        <button   style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
           <mat-icon>add</mat-icon>
         </button>
         <!--  *ngIf="(!node.expandable && !node.isRoot)" -->
-        <button style="margin-left: 10px;" mat-icon-button (click)="deleteNode(node)">
+        <button  style="margin-left: 10px;" mat-icon-button (click)="deleteNode(node)">
           <mat-icon>delete</mat-icon>
         </button>
 
@@ -59,7 +45,7 @@
           <mat-icon>update</mat-icon>
         </button>
 
-        <button style="margin-left: 10px;" mat-icon-button (click)="dispatchedNode(node)">
+        <button  style="margin-left: 10px;" mat-icon-button (click)="dispatchedNode(node)">
           <mat-icon>drag_handle</mat-icon>
         </button>
 
@@ -89,7 +75,7 @@
                 <mat-label>Select Node TO Drop Node</mat-label>
                 <mat-select [(ngModel)]="selected" name="node">
                   <mat-option *ngFor="let option of selectOptions" [value]="option">
-                    {{option.item}}
+                    {{option.name}}
                   </mat-option>
                 </mat-select>
                 <!-- debug button -->
@@ -103,37 +89,24 @@
           </mat-card-content>
         </mat-card>
         <!-- select option for parent End -->
+
+        <mat-card *ngIf="node.adding"  class="example-card">
+          <mat-card-content>
+            <button mat-icon-button disabled></button>
+            <mat-form-field>
+              <mat-label>New item...</mat-label>
+              <input matInput #itemValue placeholder="Ex. Lettuce" />
+            </mat-form-field>
+            <app-button [color]="'warn'" [text]="'Add'" mat-button
+              (click)="saveNode(node, itemValue.value)">Save</app-button>
+          </mat-card-content>
+        </mat-card>
+
       </mat-card-content>
     </mat-card>
   </mat-tree-node>
 
-
-  <!-- (click)="saveNode(node, itemValue.value)" -->
 </mat-tree>
 
 
 
-
-<!-- wrong tmeplates -->
-<!-- 
-  {{
-    node.children.length>0?
-  <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item">
-    <mat-icon class="mat-icon-rtl-mirror">
-      {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-    </mat-icon>
-  </button>: {{node.item}}
-
-  }}
-</mat-option> -->
-
-<!-- <mat-option *ngFor="let node of selectOptions" [value]="node">
-  <ng-container *ngIf="node.children?.length; else noChildren">
-    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item">
-      <mat-icon class="mat-icon-rtl-mirror">
-        'expand_more'  
-      </mat-icon>
-    </button>
-    {{ node.item }}
-  </ng-container>
-  <ng-template #noChildren>{{ node.item }}</ng-template> -->

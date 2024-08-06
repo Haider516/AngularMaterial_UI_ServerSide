@@ -33,16 +33,19 @@ const HttpOptions = {
 //tree declarations
 export class TodoItemNode {
   children!: TodoItemNode[];
-  item!: string;
+  id!: number;
+  name!: string;
 }
 
 /** Flat to-do item node with expandable and level information */
 export class TodoItemFlatNode {
-  item!: string;
+  id!: number;
+  name!: string;
   level!: number;
   expandable!: boolean;
   hasChild!: boolean; // new property
   updating!: boolean;
+  adding!: boolean;
   isdraged!: boolean;
   isRoot!: boolean;
 
@@ -50,187 +53,6 @@ export class TodoItemFlatNode {
 
 
 
-
-/**
- * The Json object for to-do list data.
- */
-//
-// const usersCV = {
-//   cvs: {
-//     JohnDoe: {
-//       summary: "Experienced software engineer with a passion for developing innovative programs.",
-//       experienceJohnDoe: [
-//         {
-//           company: "Tech Solutions",
-//           responsibilities: "Led a team of 10 in developing a new software platform, reducing processing time by 30%."
-//         },
-//       ]
-//     },
-//     JaneSmith: {
-//       summary: "Results-driven marketing professional with over 10 years of experience in digital marketing.",
-//       experienceJaneSmith: [
-//         {
-//           company: "MarketPro",
-//           position: "Marketing Manager",
-//         },
-
-//       ]
-//     },
-
-
-//   },
-//   document: {
-//     "sheets": "A4size"
-//   },
-//   accessories: {
-//     "abcd": "jiooo"
-//   }
-
-// };
-
-/**
- * Checklist database, it can build a tree structured Json object.
- * Each node in Json object represents a to-do item or a category.
- * If a node is a category, it has children items and new items can be added under the category.
- */
-@Injectable()
-export class ChecklistDatabase {
-
-  products: PSLPlayerTree[] = [];
-  pageMeta!: PaginationMeta;
-  
-  dataChange = new BehaviorSubject<TodoItemNode[]>([]);
-
-  get data(): TodoItemNode[] { return this.dataChange.value; }
-
-  constructor(private http: HttpClient,private treeService: TreeServiceService) {
-    this.initialize();
-  }
-
-  initialize() {
-
-    this.treeService.dataChange.subscribe((data: { players: PSLPlayerTree[]; pagination: PaginationMeta }) => {
-      this.products = data.players;
-      this.pageMeta = data.pagination;
-    });
-    
-    console.log(  this.products,this.pageMeta);
-    debugger
-    const data = this.buildFileTree(this.products, 0);
-    console.log('data', data);
-    debugger
-    // Notify the change.
-    this.dataChange.next(data);
-  }
-
-
-  // here adding a api  to handle the data from strapi
-
-
-  getproduct() {
-    // this.http is the Angular HttpClient service.
-    this.http
-      .get("http://localhost:1337/api/products", {
-        params: { populate: "*" },
-      })
-      .subscribe((response) => {
-        console.log(response);
-        return response;
-
-      });
-  }
-  /**
-   * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
-   * The return value is the list of `TodoItemNode`.
-   */
-  buildFileTree(obj: { [key: string]: any }, level: number): TodoItemNode[] {
-    return Object.keys(obj).reduce<TodoItemNode[]>((accumulator, key) => {
-      const value = obj[key];
-      const node = new TodoItemNode();
-      node.item = key;
-      // debugger
-      if (value != null) {
-        if (typeof value === 'object') {
-          node.children = this.buildFileTree(value, level + 1);
-        } else {
-          node.item = value;
-        }
-      }
-      //   debugger
-      return accumulator.concat(node);
-    }, []);
-  }
-
-  /** Add an item to to-do list */
-  insertItem(parent: TodoItemNode, name: string) {
-    // changes for adding child
-    debugger
-    if (!parent.children)
-      parent.children = [];
-    parent.children.push({ item: name } as TodoItemNode);
-    this.dataChange.next(this.data);
-  }
-
-  updateItem(node: TodoItemNode, name: string) {
-    node.item = name;
-    this.dataChange.next(this.data);
-  }
-
-
-  deleteItem(parentNode: TodoItemNode | undefined, node: TodoItemNode) {
-    debugger
-    if (parentNode === undefined) {
-      this.data.shift();
-    }
-    else {
-      const index = parentNode!.children.indexOf(node);
-      //   debugger
-      if (index !== -1) {
-        parentNode!.children.splice(index, 1);
-        debugger
-      }
-    }
-
-    this.dataChange.next(this.data);
-
-  }
-
-  //to update the item value 
-
-  updateItemNode(node: TodoItemNode, updateditem: string) {
-    debugger
-    node.item = updateditem;
-    this.dataChange.next(this.data);
-  }
-
-  getChanged(selectedflatNode: TodoItemNode, nodeFlat: TodoItemNode, parentNode: TodoItemNode) {
-    debugger
-    // to handlecase   if the selected Node  is not root 
-    if (parentNode !== undefined) {
-      let index = parentNode.children.indexOf(nodeFlat)
-      parentNode.children.splice(index, 1);
-      debugger
-    } else {  // if its root than no parent i.e parent is undefined 
-      console.log(this.data);
-      let indexOfParent = this.data.indexOf(nodeFlat);
-      this.data.splice(indexOfParent, 1)
-      //  debugger
-
-    }
-
-    if (!!selectedflatNode.children?.length) {
-      selectedflatNode.children.push(nodeFlat);
-
-      this.dataChange.next(this.data);
-    } else {
-      selectedflatNode.children = [];
-      selectedflatNode.children.push(nodeFlat);
-      this.dataChange.next(this.data);
-    }
-
-  }
-
-}
 
 /**
  * @title Tree with checkboxes
@@ -243,7 +65,7 @@ export class ChecklistDatabase {
   ],
   templateUrl: './tree-with-check-box.component.html',
   styleUrl: './tree-with-check-box.component.css',
-  providers: [ChecklistDatabase],
+  providers: [],
 })
 
 export class TreeWithCheckBoxComponent {
@@ -252,8 +74,9 @@ export class TreeWithCheckBoxComponent {
   private num: number = 0;
   selectOptions: TodoItemFlatNode[] = [];
   selected!: TodoItemFlatNode;
-  //private tempNode!: TodoItemNode;
-  // private tempNodeparent!: TodoItemNode | undefined;
+
+  products: TodoItemNode[] = [];
+  pageMeta: any;
 
   flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();
 
@@ -275,7 +98,7 @@ export class TreeWithCheckBoxComponent {
   /** The selection for checklist */
   checklistSelection = new SelectionModel<TodoItemFlatNode>(true /* multiple */);
 
-  constructor(private _database: ChecklistDatabase) {
+  constructor(private http: HttpClient, private treeService: TreeServiceService) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
       this.isExpandable, this.getChildren);
     console.log("actionn", this.treeFlattener);
@@ -284,12 +107,62 @@ export class TreeWithCheckBoxComponent {
     this.treeControl = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     //method for data source
-    _database.dataChange.subscribe(data => {
-      this.dataSource.data = data;
+
+    //_________-IMPORTANT
+
+    // this.treeService.dataChange.subscribe((data: { players: any[]; pagination: any }) => {
+    //   this.products = this.transformData(data.players);
+    //   debugger
+    //   this.pageMeta = data.pagination;
+    //   this.dataSource.data = this.products;
+    // });
+
+
+    ///edited 
+
+    this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
+
+      this.products = data.data;
+      debugger;
+
+      this.dataSource.data = this.products;
     });
+
+    //________ 
 
     console.log("h", this.dataSource);
     //   debugger
+  }
+
+  private transformData(data: any[]): TodoItemNode[] {
+    const map = new Map<number, TodoItemNode>();
+
+    // First pass: create a map of all nodes
+    data.forEach(item => {
+      const node: TodoItemNode = {
+        id: item.id,
+        name: item.attributes.name,
+        children: []
+      };
+      map.set(node.id, node);
+    });
+
+    // Second pass: populate children
+    data.forEach(item => {
+      const parentId = item.attributes.parent.data?.id;
+      if (parentId) {
+        const parent = map.get(parentId);
+        const child = map.get(item.id);
+        if (parent && child) {
+          parent.children!.push(child);
+        }
+      }
+    });
+
+    // Extract top-level nodes (those without parents)
+    const tree = Array.from(map.values()).filter(node => !data.some(item => item.id === node.id && item.attributes.parent.data));
+
+    return tree;
   }
 
 
@@ -301,7 +174,7 @@ export class TreeWithCheckBoxComponent {
 
   hasChild = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.expandable;
 
-  hasNoContent = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.item === '';
+  hasNoContent = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.name === '';
 
   // isEvenIndex = (_: number, node: TodoItemFlatNode) => this.treeControl.dataNodes.indexOf(node) % 2 === 0;
 
@@ -309,6 +182,7 @@ export class TreeWithCheckBoxComponent {
 
   //
   toupdate = (node: TodoItemFlatNode) => node.updating = true;
+  toAdd = (node: TodoItemFlatNode) => node.adding = true;
   todrag = (node: TodoItemFlatNode) => node.isdraged = true;
   //might  be  used
   isRoot = (node: TodoItemFlatNode) => node.isRoot = true;
@@ -320,12 +194,14 @@ export class TreeWithCheckBoxComponent {
   transformer = (node: TodoItemNode, level: number) => {
     // debugger
     const existingNode = this.nestedNodeMap.get(node);
-    const flatNode = existingNode && existingNode.item === node.item
+    const flatNode = existingNode && existingNode.id === node.id
       ? existingNode
       : new TodoItemFlatNode();
-    flatNode.item = node.item;
+    flatNode.id = node.id;
+    flatNode.name = node.name;
     flatNode.level = level;
     if (flatNode.level === 0) {
+
       flatNode.isRoot = true;
     }
     else {
@@ -440,43 +316,45 @@ export class TreeWithCheckBoxComponent {
 
   /** Select the category so we can insert the new item. */
   addNewItem(node: TodoItemFlatNode) {
-    const parentNode = this.flatNodeMap.get(node);
-
-    debugger
-    
-    this._database.insertItem(parentNode!, '');
-    this.treeControl.expand(node);
+    const nodeFlatted: TodoItemNode = this.flatNodeMap.get(node)!;
+    this.toAdd(node)
     debugger
   }
 
   /** Save the node to database */
   saveNode(node: TodoItemFlatNode, itemValue: string) {
-    const nestedNode = this.flatNodeMap.get(node);
-    //get parent node 
-    const parentNode = this.getParentNode(node);
-    const parentNode1 = this.flatNodeMap.get(parentNode!);
+    const flatNode = this.flatNodeMap.get(node);
     debugger
-    if (parentNode1?.item === itemValue) {
-      console.log("not poosible ");
-    } else {
-      this._database.updateItem(nestedNode!, itemValue);
-    }
+    let parent = flatNode?.id;
+    let name = itemValue
+
+    //calling Service 
+    this.treeService.addNodeService(parent!, name);
+    // yahan API call hu  gi add karna  k liya 
 
   }
 
   deleteNode(node: TodoItemFlatNode) {
-    console.log(this.treeControl.dataNodes);
-
-    //  const parentNode = this.flatNodeMap.get(node);
-    const parentNode = this.getParentNode(node);
-
-    const parentNode1 = this.flatNodeMap.get(parentNode!);
+    // console.log(this.treeControl.dataNodes);
     const nodenew = this.flatNodeMap.get(node)
-    debugger
-    // console.log("Node:", node.);
-    //  this._database.deleteItem( this.flatNodeMap.get(node)!);
 
-    this._database.deleteItem(parentNode1!, nodenew!);
+    debugger
+    if (!!nodenew?.children.length) {
+      nodenew.children.map((item) => {
+        let id = item.id;
+        // this.treeService.deleteNodeService(id!)
+        let nodenewNested = this.nestedNodeMap.get(item)
+
+        this.deleteNode(nodenewNested!);
+      })
+    }
+    else {
+      let id = nodenew?.id;
+      this.treeService.deleteNodeService(id!)
+      debugger
+    }
+
+    this.treeService.deleteNodeService(nodenew?.id!)
 
 
   }
@@ -501,32 +379,19 @@ export class TreeWithCheckBoxComponent {
   // }
 
   //this works when i click  the  save button forthe updated field
+
   getupdatedValue(node: TodoItemFlatNode, item: string) {
     debugger
-    // console.log(item);
-    // const parentNode = this.getParentNode(node);
-    // const parentNode1 = this.flatNodeMap.get(parentNode!);
-    const nodenew = this.flatNodeMap.get(node)
-    // nodenew?.item != item;
-    //   console.log(nodenew);
-    // this.tempNodeparent = undefined;
-    // this.dataSource.data = [...this.dataSource.data];
-    //  this.num -= 1;
-    this._database.updateItemNode(nodenew!, item);
+    const nodenew = this.flatNodeMap.get(node);
+    let id = nodenew?.id;
+
+    this.treeService.updateNodeService(item, id!)
+
   }
 
   updateNodeextra(node: TodoItemFlatNode) {
     this.toupdate(node);
     debugger
-
-    // debugger
-    // this.num += 1;
-    // this.tempNode = nodenew!;
-    // this.tempNodeparent = parentNode1!;
-    // console.log("Node:", node.);
-    // this._database.detectingchange();
-
-    //  this._database.updateItem(parentNode1!);
   }
 
 
@@ -550,18 +415,8 @@ export class TreeWithCheckBoxComponent {
       allNode = this.treeControl.getDescendants(rootNode!);
       //making   alist of nodes that are decendent to the selected Node root excluding selected  node descendants
       result = (allNode.filter(item => !SelectedNodeDescendants.includes(item))).filter((item) => item !== node);
-
+      result.push(rootNode)
     }
-    // let parentNode = this.flatNodeMap.get(this.getParentNode(node)!)
-    // console.log(parentNode);
-    debugger
-    //geting root node as level zero /// making change to find the root wrt child
-    //  let rootNode = this.treeControl.dataNodes[0];
-
-    //let nodeINFflat = this.flatNodeMap.get(node)
-    // if i did it wrt flat node its gives me descendants 
-    //  let nodeNested = this.nestedNodeMap.get(nodeINFflat!);
-
 
     //fetching othernodes wrt the root node i.e other than fetched root i will get other   rooot sand  theirchild
     let nodearray = this.otherRootNodes(rootNode);
@@ -585,15 +440,22 @@ export class TreeWithCheckBoxComponent {
   updateNodePosition(node: TodoItemFlatNode) {
 
     console.log("selected", this.selected);
-    console.log(node);
+    // let selectedNodeFlat=this.flatNodeMap.get(this.selected)
     //The below is the Node that is to be positioned with  the node selected 
     let nodeFlat = this.flatNodeMap.get(node);
+    console.log(nodeFlat);
     //get parent for the node  
 
     let selectedflatNode = this.flatNodeMap.get(this.selected);
-    let parentNode = this.flatNodeMap.get(this.getParentNode(node)!);
+    console.log(selectedflatNode);
+
+    let newParentID = selectedflatNode?.id;
+    let nodeToUpdatedID = nodeFlat?.id;
+    debugger
+    this.treeService.postioning(newParentID!, nodeToUpdatedID!);
+    //let parentNode = this.flatNodeMap.get(this.getParentNode(node)!);
     this.selectOptions = [];
-    this._database.getChanged(selectedflatNode!, nodeFlat!, parentNode!);
+    // this._database.getChanged(selectedflatNode!, nodeFlat!, parentNode!);
 
   }
 
@@ -603,8 +465,7 @@ export class TreeWithCheckBoxComponent {
     //change
     //  let root = this.treeControl.dataNodes.filter(node => node.level === 0)[0];
     let root1 = this.treeControl.dataNodes.filter(node => node.level === 0);
-    // root[0].isRoot! === true;
-    // console.log(root[0]);
+
     root1.map((item) => {
       item.isRoot = true
     })
@@ -631,12 +492,6 @@ export class TreeWithCheckBoxComponent {
 
     let roots = this.treeControl.dataNodes.filter(node => node.level === 0);
     let rootSibling = roots.filter(item => item != rootNode);//this return   array
-
-    // rootSibling.reduce( (accumulator, currentValue)=>{
-
-    //   accumulator.push( this.treeControl.getDescendants(currentValue!));
-
-    // },[])
 
     let allDescendants: TodoItemFlatNode[] = rootSibling.reduce((accumulator: TodoItemFlatNode[], currentValue) => {
       accumulator.push((currentValue!));

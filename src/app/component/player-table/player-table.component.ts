@@ -88,17 +88,6 @@ export class PlayerTableComponent implements AfterViewInit {
       this.paginator.pageSize = this.pageSize;
       this.paginator.pageIndex = this.pageData.page;
     }
-
-    // const keyup$ = fromEvent(input, 'keyup')
-
-    //   // wait .5s between keyups to emit current value
-    //   keyup$.pipe(
-    //     map((i: any) => i.currentTarget.value),
-    //     debounceTime(500)
-    //   ).subscribe(filterX =>
-    //       this.applyFilter(filterX));
-
-
   }
 
 
@@ -106,7 +95,7 @@ export class PlayerTableComponent implements AfterViewInit {
     if (changes['data'] || changes['pageData']) {
       this.dataSource.data = this.data;
       if (this.pageData) {
-        this.paginator.length = this.pageData.total;
+        this.paginator.length = this.pageData.total ;
       }
       console.log("Paginator length set to:", this.paginator.length);
       console.log("Paginator page size set to:", this.paginator.pageSize);
@@ -117,6 +106,10 @@ export class PlayerTableComponent implements AfterViewInit {
 
   performSearch(searchTerm: string) {
     this.playerCrudService.filteringData(searchTerm, this.paginator.pageIndex, this.paginator.pageSize, this.active, this.direction);
+  }
+
+  ngOnDestroy() {
+    this.searchInput.complete();
   }
 
   async applyFilter(event: Event) {
