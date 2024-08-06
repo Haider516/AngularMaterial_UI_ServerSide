@@ -34,11 +34,6 @@ export class TreeServiceService {
 
   error: any | undefined;
   token = "";
-  // dataChange = new BehaviorSubject<{ players: PSLPlayerTree[]; pagination: PaginationMeta }>({
-  //   players: [],
-  //   pagination: { page: 0, pageSize: 0, pageCount: 0, total: 0 }
-  // });
-
   dataChanges = new BehaviorSubject<{ data: any[] }>({
     data: [],
   });

@@ -207,20 +207,22 @@ export class TreeWithCheckBoxComponent {
     else {
       flatNode.isRoot = false;
     }
-    //it was previously flatNode.expandable = !!node.children?.length;
-    // causing an  issue for every  item to be expandable 
-    flatNode.expandable = !!node.children?.length; // edit this to true to make it always expandable
+
+   // edit this to true to make it always expandable based on length
+    flatNode.expandable = !!node.children?.length;
+     
     // add this line. this property will help 
+    
     //  to hide the expand button in a node
     flatNode.hasChild = !!node.children?.length;
+
     flatNode.updating = false;
 
     flatNode.isdraged = false;
-    //  debugger
+  
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
-    //debugger
-    return flatNode;
+      return flatNode;
   }
 
 
@@ -360,24 +362,7 @@ export class TreeWithCheckBoxComponent {
   }
 
 
-  //the function is used  to save value to the temp data for updating 
-  //it is the first function that  is invoked 
-  //function  depreciated
-  // updateNode(node: TodoItemFlatNode) {
-
-  //   const parentNode = this.getParentNode(node);
-  //   const parentNode1 = this.flatNodeMap.get(parentNode!);
-  //   const nodenew = this.flatNodeMap.get(node)
-  //   debugger
-  //   this.num += 1;
-  //   this.tempNode = nodenew!;
-  //   this.tempNodeparent = parentNode1!;
-  //   // console.log("Node:", node.);
-  //   // this._database.detectingchange();
-
-  //   //  this._database.updateItem(parentNode1!);
-  // }
-
+ 
   //this works when i click  the  save button forthe updated field
 
   getupdatedValue(node: TodoItemFlatNode, item: string) {
@@ -426,9 +411,7 @@ export class TreeWithCheckBoxComponent {
     console.log(x);
 
     debugger
-    // nodearray.push(result)
-    // console.log();
-
+   
     //Assigning option the  list Of the Node
     this.selectOptions = x;
     debugger
