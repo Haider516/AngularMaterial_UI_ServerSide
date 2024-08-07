@@ -19,11 +19,10 @@
 
       <mat-card-content>
 
-        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item" *ngIf="node.expandable">
+        <button (click)="fetchNode(node)" mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item" *ngIf="node.expandable">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
-
         </button>
 
         <!-- Add space for removed button if not expandable -->
@@ -31,7 +30,9 @@
 
         </div>
         {{node.name}}
-      
+        <mat-progress-bar *ngIf="node.isLoading"
+        mode="indeterminate"
+        class="example-tree-progress-bar"></mat-progress-bar>
 
         <button   style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
           <mat-icon>add</mat-icon>

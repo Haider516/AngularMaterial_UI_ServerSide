@@ -19,7 +19,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { PaginationMeta, PlayersService } from '../../service/players.service';
 import { PSLPlayer, PSLPlayerTree } from '../../playerInterface';
 import { TreeServiceService } from '../../service/tree-service.service';
-
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 const HttpOptions = {
@@ -39,6 +39,7 @@ export class TodoItemNode {
 
 /** Flat to-do item node with expandable and level information */
 export class TodoItemFlatNode {
+
   id!: number;
   name!: string;
   level!: number;
@@ -46,8 +47,10 @@ export class TodoItemFlatNode {
   hasChild!: boolean; // new property
   updating!: boolean;
   adding!: boolean;
+  childChecked!: boolean;
   isdraged!: boolean;
   isRoot!: boolean;
+  isLoading!: boolean;
 
 }
 
@@ -61,7 +64,7 @@ export class TodoItemFlatNode {
   selector: 'app-tree-with-check-box',
   standalone: true,
   imports: [MatIconModule, CommonModule, MatTreeModule, MatIcon, MatCheckbox, MatLabel, MatError, MatFormField, MatInput, ButtonComponent,
-    MatCard, MatCardContent, CommonModule, MatCard, MatCardContent, MatCardHeader, MatCardModule, FormsModule, MatSelectModule
+    MatCard,MatProgressBarModule, MatCardContent, CommonModule, MatCard, MatCardContent, MatCardHeader, MatCardModule, FormsModule, MatSelectModule
   ],
   templateUrl: './tree-with-check-box.component.html',
   styleUrl: './tree-with-check-box.component.css',
@@ -74,7 +77,6 @@ export class TreeWithCheckBoxComponent {
   private num: number = 0;
   selectOptions: TodoItemFlatNode[] = [];
   selected!: TodoItemFlatNode;
-
   products: TodoItemNode[] = [];
   pageMeta: any;
 
@@ -101,29 +103,18 @@ export class TreeWithCheckBoxComponent {
   constructor(private http: HttpClient, private treeService: TreeServiceService) {
     this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
       this.isExpandable, this.getChildren);
-    console.log("actionn", this.treeFlattener);
+    // console.log("actionn", this.treeFlattener);
 
     // 
     this.treeControl = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     //method for data source
 
-    //_________-IMPORTANT
-
-    // this.treeService.dataChange.subscribe((data: { players: any[]; pagination: any }) => {
-    //   this.products = this.transformData(data.players);
-    //   debugger
-    //   this.pageMeta = data.pagination;
-    //   this.dataSource.data = this.products;
-    // });
-
-
-    ///edited 
 
     this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
 
       this.products = data.data;
-      debugger;
+      //debugger;
 
       this.dataSource.data = this.products;
     });
@@ -132,37 +123,6 @@ export class TreeWithCheckBoxComponent {
 
     console.log("h", this.dataSource);
     //   debugger
-  }
-
-  private transformData(data: any[]): TodoItemNode[] {
-    const map = new Map<number, TodoItemNode>();
-
-    // First pass: create a map of all nodes
-    data.forEach(item => {
-      const node: TodoItemNode = {
-        id: item.id,
-        name: item.attributes.name,
-        children: []
-      };
-      map.set(node.id, node);
-    });
-
-    // Second pass: populate children
-    data.forEach(item => {
-      const parentId = item.attributes.parent.data?.id;
-      if (parentId) {
-        const parent = map.get(parentId);
-        const child = map.get(item.id);
-        if (parent && child) {
-          parent.children!.push(child);
-        }
-      }
-    });
-
-    // Extract top-level nodes (those without parents)
-    const tree = Array.from(map.values()).filter(node => !data.some(item => item.id === node.id && item.attributes.parent.data));
-
-    return tree;
   }
 
 
@@ -184,12 +144,14 @@ export class TreeWithCheckBoxComponent {
   toupdate = (node: TodoItemFlatNode) => node.updating = true;
   toAdd = (node: TodoItemFlatNode) => node.adding = true;
   todrag = (node: TodoItemFlatNode) => node.isdraged = true;
+  toload = (node: TodoItemFlatNode) => !node.isLoading ;
+
   //might  be  used
   isRoot = (node: TodoItemFlatNode) => node.isRoot = true;
   /**
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
    */
-
+  isChecked = (node: TodoItemFlatNode) => !node.childChecked
 
   transformer = (node: TodoItemNode, level: number) => {
     // debugger
@@ -208,21 +170,39 @@ export class TreeWithCheckBoxComponent {
       flatNode.isRoot = false;
     }
 
-   // edit this to true to make it always expandable based on length
-    flatNode.expandable = !!node.children?.length;
-     
-    // add this line. this property will help 
-    
-    //  to hide the expand button in a node
-    flatNode.hasChild = !!node.children?.length;
+    /**
+     * 
+     * 
+     * 
+     *      children => true yahn par ayai ga 
+     * 
+     * 
+     * 
+     */
 
+
+    //____________**********__________________
+    // edit data portion
+    // edit this to true to make it always expandable based on length
+    flatNode.expandable = !!node.children?.length;
+    flatNode.expandable = !!node.children
+    // add this line. this property will help 
+
+    //  to hide the expand button in a node
+    //  flatNode.hasChild = !!node.children?.length;
+    flatNode.hasChild = !!node.children;
+
+    //____________**********__________________
+    //   debugger
     flatNode.updating = false;
 
     flatNode.isdraged = false;
-  
+    flatNode.adding = false;
+    flatNode.isLoading = false;
+    //flatNode.childChecked = false;
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
-      return flatNode;
+    return flatNode;
   }
 
 
@@ -362,7 +342,7 @@ export class TreeWithCheckBoxComponent {
   }
 
 
- 
+
   //this works when i click  the  save button forthe updated field
 
   getupdatedValue(node: TodoItemFlatNode, item: string) {
@@ -411,7 +391,7 @@ export class TreeWithCheckBoxComponent {
     console.log(x);
 
     debugger
-   
+
     //Assigning option the  list Of the Node
     this.selectOptions = x;
     debugger
@@ -422,15 +402,12 @@ export class TreeWithCheckBoxComponent {
   // debug button
   updateNodePosition(node: TodoItemFlatNode) {
 
-    console.log("selected", this.selected);
-    // let selectedNodeFlat=this.flatNodeMap.get(this.selected)
-    //The below is the Node that is to be positioned with  the node selected 
     let nodeFlat = this.flatNodeMap.get(node);
-    console.log(nodeFlat);
+    // console.log(nodeFlat);
     //get parent for the node  
 
     let selectedflatNode = this.flatNodeMap.get(this.selected);
-    console.log(selectedflatNode);
+    //console.log(selectedflatNode);
 
     let newParentID = selectedflatNode?.id;
     let nodeToUpdatedID = nodeFlat?.id;
@@ -445,16 +422,9 @@ export class TreeWithCheckBoxComponent {
   // Reference  parent   node : 
   getRootNode() {
     console.log(this.treeControl.dataNodes);
-    //change
-    //  let root = this.treeControl.dataNodes.filter(node => node.level === 0)[0];
-    let root1 = this.treeControl.dataNodes.filter(node => node.level === 0);
-
-    root1.map((item) => {
-      item.isRoot = true
-    })
-    console.log(root1);
     debugger
-    //  this.isRoot(root);
+    //change
+
   }
 
 
@@ -493,6 +463,51 @@ export class TreeWithCheckBoxComponent {
     debugger
   }
 
+  async fetchNode(node: TodoItemFlatNode) {
+    this.toload(node);
+    
+    let fetchID = node.id;
+  
+    try {
+      // Fetch children using the treeService and convert Observable to Promise
+      let childs = await this.treeService.getChild(fetchID).toPromise();
+      console.log('Fetched children:', childs); // Debugging line
+  
+      // Ensure the fetched data is an array
+      if (!Array.isArray(childs)) {
+        throw new Error('Fetched data is not an array');
+      }
+  
+      // Convert received data to TodoItemNode array
+      let mappedChildren = this.mapToTodoItemNodeArray(childs);
+  
+      // Get the corresponding flatNode
+      let flatNode = this.flatNodeMap.get(node);
+  
+      // Ensure flatNode exists and update its children
+      if (flatNode) {
+        flatNode.children = mappedChildren;
+      }
+  
+      // Update dataSource (if necessary)
+      this.dataSource.data = [...this.dataSource.data];
+  
+    } catch (error) {
+      console.error('Error fetching node data', error);
+    }
+  }
+  
+  
+  private mapToTodoItemNodeArray(data: any[]): TodoItemNode[] {
+    return data.map(item => {
+      let node = new TodoItemNode();
+      node.id = item.id;
+      node.name = item.name;
+      node.children = item.children ? this.mapToTodoItemNodeArray(item.children) : [];
+      return node;
+    });
+  }
+
 }
 
 
@@ -500,3 +515,7 @@ export class TreeWithCheckBoxComponent {
 
 
 
+
+
+
+// transform karna ha cahnge aikparameter add   karna expandablek liya aur children  empty rakha  ha 
