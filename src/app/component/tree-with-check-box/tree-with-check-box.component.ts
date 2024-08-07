@@ -19,7 +19,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { PaginationMeta, PlayersService } from '../../service/players.service';
 import { PSLPlayer, PSLPlayerTree } from '../../playerInterface';
 import { TreeServiceService } from '../../service/tree-service.service';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 
 const HttpOptions = {
@@ -32,6 +32,7 @@ const HttpOptions = {
 
 //tree declarations
 export class TodoItemNode {
+  status!:boolean;
   children!: TodoItemNode[];
   id!: number;
   name!: string;
@@ -64,7 +65,7 @@ export class TodoItemFlatNode {
   selector: 'app-tree-with-check-box',
   standalone: true,
   imports: [MatIconModule, CommonModule, MatTreeModule, MatIcon, MatCheckbox, MatLabel, MatError, MatFormField, MatInput, ButtonComponent,
-    MatCard,MatProgressBarModule, MatCardContent, CommonModule, MatCard, MatCardContent, MatCardHeader, MatCardModule, FormsModule, MatSelectModule
+    MatCard, MatProgressBarModule, MatCardContent, CommonModule, MatCard, MatCardContent, MatCardHeader, MatCardModule, FormsModule, MatSelectModule
   ],
   templateUrl: './tree-with-check-box.component.html',
   styleUrl: './tree-with-check-box.component.css',
@@ -144,7 +145,7 @@ export class TreeWithCheckBoxComponent {
   toupdate = (node: TodoItemFlatNode) => node.updating = true;
   toAdd = (node: TodoItemFlatNode) => node.adding = true;
   todrag = (node: TodoItemFlatNode) => node.isdraged = true;
-  toload = (node: TodoItemFlatNode) => !node.isLoading ;
+  toload = (node: TodoItemFlatNode) => !node.isLoading;
 
   //might  be  used
   isRoot = (node: TodoItemFlatNode) => node.isRoot = true;
@@ -184,13 +185,13 @@ export class TreeWithCheckBoxComponent {
     //____________**********__________________
     // edit data portion
     // edit this to true to make it always expandable based on length
-    flatNode.expandable = !!node.children?.length;
-    flatNode.expandable = !!node.children
+  //  flatNode.expandable = !!node.children?.length;
+    flatNode.expandable =  node.status;
     // add this line. this property will help 
 
     //  to hide the expand button in a node
-    //  flatNode.hasChild = !!node.children?.length;
-    flatNode.hasChild = !!node.children;
+    //flatNode.hasChild = !!node.children?.length;
+    flatNode.hasChild = node.status;
 
     //____________**********__________________
     //   debugger
@@ -465,50 +466,53 @@ export class TreeWithCheckBoxComponent {
 
   async fetchNode(node: TodoItemFlatNode) {
     this.toload(node);
-    
+
     let fetchID = node.id;
-  
+
     try {
       // Fetch children using the treeService and convert Observable to Promise
       let childs = await this.treeService.getChild(fetchID).toPromise();
       console.log('Fetched children:', childs); // Debugging line
-  
+
       // Ensure the fetched data is an array
       if (!Array.isArray(childs)) {
         throw new Error('Fetched data is not an array');
       }
-  
+
       // Convert received data to TodoItemNode array
       let mappedChildren = this.mapToTodoItemNodeArray(childs);
-  
+
       // Get the corresponding flatNode
       let flatNode = this.flatNodeMap.get(node);
-  
+
       // Ensure flatNode exists and update its children
       if (flatNode) {
         flatNode.children = mappedChildren;
       }
-  
+
       // Update dataSource (if necessary)
       this.dataSource.data = [...this.dataSource.data];
-  
+
     } catch (error) {
       console.error('Error fetching node data', error);
     }
   }
-  
-  
+
+
   private mapToTodoItemNodeArray(data: any[]): TodoItemNode[] {
     return data.map(item => {
       let node = new TodoItemNode();
       node.id = item.id;
       node.name = item.name;
-      node.children = item.children ? this.mapToTodoItemNodeArray(item.children) : [];
+      node.children = [];
+      node.status=item.status;
       return node;
     });
   }
 
 }
+
+
 
 
 
