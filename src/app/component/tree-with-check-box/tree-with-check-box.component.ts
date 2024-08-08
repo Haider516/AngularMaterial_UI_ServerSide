@@ -2,7 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { Component, Injectable, Input, input } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, debounceTime, Subject } from 'rxjs';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -32,7 +32,7 @@ const HttpOptions = {
 
 //tree declarations
 export class TodoItemNode {
-  status!:boolean;
+  status!: boolean;
   children!: TodoItemNode[];
   id!: number;
   name!: string;
@@ -80,6 +80,12 @@ export class TreeWithCheckBoxComponent {
   selected!: TodoItemFlatNode;
   products: TodoItemNode[] = [];
   pageMeta: any;
+  //filter
+  filterValue = ""
+  // searchBox = document.getElementById('search');
+
+  //For Search Box Filtering
+  searchInput = new Subject<string>();
 
   flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();
 
@@ -122,7 +128,14 @@ export class TreeWithCheckBoxComponent {
 
     //________ 
 
-    console.log("h", this.dataSource);
+    console.log("this.dataSource", this.dataSource);
+
+    this.searchInput
+      .pipe(debounceTime(300))
+      .subscribe((searchTerm: string) => {
+        // Call your search function here
+        this.performSearch(searchTerm);
+      });
     //   debugger
   }
 
@@ -185,8 +198,8 @@ export class TreeWithCheckBoxComponent {
     //____________**********__________________
     // edit data portion
     // edit this to true to make it always expandable based on length
-  //  flatNode.expandable = !!node.children?.length;
-    flatNode.expandable =  node.status;
+    //  flatNode.expandable = !!node.children?.length;
+    flatNode.expandable = node.status;
     // add this line. this property will help 
 
     //  to hide the expand button in a node
@@ -364,7 +377,6 @@ export class TreeWithCheckBoxComponent {
   dispatchedNode(node: TodoItemFlatNode) {
     //    console.log(this._database[0]!.flatNodeMap());
     this.todrag(node)
-
     let rootNode: TodoItemFlatNode;
     let allNode: TodoItemFlatNode[];
     let result: TodoItemFlatNode[];
@@ -505,9 +517,27 @@ export class TreeWithCheckBoxComponent {
       node.id = item.id;
       node.name = item.name;
       node.children = [];
-      node.status=item.status;
+      node.status = item.status;
       return node;
     });
+  }
+
+
+  //This Below  are For Filtering
+
+  performSearch(searchTerm: string) {
+    debugger
+    this.treeService.filterData(searchTerm)
+ }
+  ngOnDestroy() {
+    this.searchInput.complete();
+  }
+
+  async applyFilter(event: Event) {
+    const filterX = (event.target as HTMLInputElement).value;
+    this.filterValue = filterX;
+    this.searchInput.next(this.filterValue);
+
   }
 
 }

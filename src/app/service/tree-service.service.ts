@@ -202,6 +202,25 @@ export class TreeServiceService {
     );
   }
 
+  ///tree-custom-api/:filterData
+
+  filterData(filterData: string) {
+    
+    this.getfilterTee(filterData).subscribe((players) => {
+      this.dataChanges.next({ data: players });
+    });
+    debugger
+  
+  }
+
+  getfilterTee(filterData: string): Observable<any[]> {
+    
+    return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/filter/${filterData}`).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     this.error = error.message;
     console.log(this.error);
