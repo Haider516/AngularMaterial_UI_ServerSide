@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PaginationMeta, PSLPlayerTree } from '../playerInterface';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
+import { response } from 'express';
 
 
 const HttpOptions = {
@@ -171,30 +172,17 @@ export class TreeServiceService {
   }
 
 
-  // /tree-custom-api/:id
 
-  // getChild(id: Number) {
-  //   let x = this.getCustomApiDataID(id).subscribe((players) => {
-  //     return players
-  //   });
-  //   return x;
-  // }
 
-  // getCustomApiDataID(id: Number): Observable<any[]> {
-  //   return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/${id}`).pipe(
-  //     catchError((error) => this.handleError(error)),
-  //     map((response: any[]) => {
-  //       return response;
-  //     }),
+  //i   added a  new method  and used name  sodiscarding the below method  only diffrence is id  and name 
+  // getChild(id: number): Observable<any[]> {
+  //   return this.getCustomApiDataID(id).pipe(
+  //     map((response) => response)
   //   );
   // }
 
+  // 
 
-  getChild(id: number): Observable<any[]> {
-    return this.getCustomApiDataID(id).pipe(
-      map((response) => response)
-    );
-  }
 
   getCustomApiDataID(id: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/${id}`).pipe(
@@ -202,22 +190,42 @@ export class TreeServiceService {
     );
   }
 
+  // :name
+  // : Observable<any[]>
+  getChild(name: string) {
+    return this.getCustomApiDataName(name).pipe(
+      map((response) => response)
+    );
+  }
+
+  getCustomApiDataName(name: string): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${name}`)
+      .pipe(
+        catchError((error) => this.handleError(error))
+      );
+
+  }
+
+
   ///tree-custom-api/:filterData
 
   filterData(filterData: string) {
-    
+
     this.getfilterTee(filterData).subscribe((players) => {
+      console.log(players);
+
       this.dataChanges.next({ data: players });
     });
     debugger
-  
+
+
   }
 
   getfilterTee(filterData: string): Observable<any[]> {
-    
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/filter/${filterData}`).pipe(
       catchError((error) => this.handleError(error))
     );
+
   }
 
 

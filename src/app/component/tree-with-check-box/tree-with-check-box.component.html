@@ -1,8 +1,3 @@
-
-
-
-
-
 <h1>Tree Crud </h1>
 
 <!-- <button  (click)="getAllNodes()">Search</button> -->
@@ -17,7 +12,7 @@
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   <!-- Node with no content -->
   <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent " matTreeNodePadding>
-  
+
   </mat-tree-node>
 
   <!-- Regular node -->
@@ -25,27 +20,44 @@
     <mat-card>
 
       <mat-card-content>
+        <!-- (click)="fetchNode(node)" -->
 
-        <button (click)="fetchNode(node)" mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item" *ngIf="node.expandable">
+        <!-- will be reused  -->
+
+        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item" *ngIf="node.expandable">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
         </button>
+
+        <!-- (click)="fetchNode(node)" -->
+
+        <!-- <button mat-icon-button matTreeNodeToggle *ngIf="node.expandable">
+          <mat-icon class="mat-icon">
+            {{treeControl.isExpanded(node) ? 'unfold_more' : 'chevron_right'}}
+          </mat-icon>
+        </button> -->
 
         <!-- Add space for removed button if not expandable -->
         <div *ngIf="!node.expandable" class="pad">
 
         </div>
         {{node.name}}
-        <mat-progress-bar *ngIf="node.isLoading"
-        mode="indeterminate"
-        class="example-tree-progress-bar"></mat-progress-bar>
 
-        <button   style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
+        <!-- <button *ngIf="node.expandable" (click)="fetchNode(node)" style="margin-left: 10px;">load more </button> -->
+
+        <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="example-tree-progress-bar">
+        </mat-progress-bar>
+
+        <button (click)="fetchNode(node)" style="margin-left: 10px;" mat-icon-button *ngIf="node.expandable">
+          <mat-icon> unfold_more</mat-icon>
+        </button>
+
+        <button style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
           <mat-icon>add</mat-icon>
         </button>
         <!--  *ngIf="(!node.expandable && !node.isRoot)" -->
-        <button  style="margin-left: 10px;" mat-icon-button (click)="deleteNode(node)">
+        <button style="margin-left: 10px;" mat-icon-button (click)="deleteNode(node)">
           <mat-icon>delete</mat-icon>
         </button>
 
@@ -53,7 +65,7 @@
           <mat-icon>update</mat-icon>
         </button>
 
-        <button  style="margin-left: 10px;" mat-icon-button (click)="dispatchedNode(node)">
+        <button style="margin-left: 10px;" mat-icon-button (click)="dispatchedNode(node)">
           <mat-icon>drag_handle</mat-icon>
         </button>
 
@@ -98,7 +110,7 @@
         </mat-card>
         <!-- select option for parent End -->
 
-        <mat-card *ngIf="node.adding"  class="example-card">
+        <mat-card *ngIf="node.adding" class="example-card">
           <mat-card-content>
             <button mat-icon-button disabled></button>
             <mat-form-field>
@@ -115,6 +127,3 @@
   </mat-tree-node>
 
 </mat-tree>
-
-
-

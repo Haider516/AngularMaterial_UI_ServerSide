@@ -479,11 +479,11 @@ export class TreeWithCheckBoxComponent {
   async fetchNode(node: TodoItemFlatNode) {
     this.toload(node);
 
-    let fetchID = node.id;
-
+    //let fetchID = node.id;
+    let fetchName = node.name
     try {
       // Fetch children using the treeService and convert Observable to Promise
-      let childs = await this.treeService.getChild(fetchID).toPromise();
+      let childs = await this.treeService.getChild(fetchName).toPromise();
       console.log('Fetched children:', childs); // Debugging line
 
       // Ensure the fetched data is an array
@@ -527,8 +527,10 @@ export class TreeWithCheckBoxComponent {
 
   performSearch(searchTerm: string) {
     debugger
+    searchTerm = searchTerm.trim();
     this.treeService.filterData(searchTerm)
- }
+
+  }
   ngOnDestroy() {
     this.searchInput.complete();
   }
@@ -536,20 +538,13 @@ export class TreeWithCheckBoxComponent {
   async applyFilter(event: Event) {
     const filterX = (event.target as HTMLInputElement).value;
     this.filterValue = filterX;
-    this.searchInput.next(this.filterValue);
+
+    this.searchInput.next(this.filterValue)
+
 
   }
 
 }
-
-
-
-
-
-
-
-
-
 
 
 // transform karna ha cahnge aikparameter add   karna expandablek liya aur children  empty rakha  ha 
