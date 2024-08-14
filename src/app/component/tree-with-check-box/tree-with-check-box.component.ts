@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Injectable, Input, input } from '@angular/core';
+import { Component, ElementRef, Injectable, Input, input, ViewChild } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { BehaviorSubject, debounceTime, Subject } from 'rxjs';
 import { MatTreeModule } from '@angular/material/tree';
@@ -52,6 +52,7 @@ export class TodoItemFlatNode {
   isdraged!: boolean;
   isRoot!: boolean;
   isLoading!: boolean;
+  called!: boolean
 
 }
 
@@ -81,11 +82,15 @@ export class TreeWithCheckBoxComponent {
   products: TodoItemNode[] = [];
   pageMeta: any;
   //filter
-  filterValue = ""
+  filterValue = "";
+  projectState: number = 0
   // searchBox = document.getElementById('search');
 
   //For Search Box Filtering
   searchInput = new Subject<string>();
+
+  // This is Used to Clear the Input on Pagination
+  @ViewChild('input') inputElement!: ElementRef;
 
   flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();
 
@@ -116,14 +121,16 @@ export class TreeWithCheckBoxComponent {
     this.treeControl = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     //method for data source
-
-
     this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
 
       this.products = data.data;
       //debugger;
-
       this.dataSource.data = this.products;
+      // if (this.projectState >= 1) {
+      //   this.treeControl.expandAll()
+      // }
+      // this.projectState += 1;
+
     });
 
     //________ 
@@ -133,6 +140,7 @@ export class TreeWithCheckBoxComponent {
     this.searchInput
       .pipe(debounceTime(300))
       .subscribe((searchTerm: string) => {
+
         // Call your search function here
         this.performSearch(searchTerm);
       });
@@ -159,7 +167,7 @@ export class TreeWithCheckBoxComponent {
   toAdd = (node: TodoItemFlatNode) => node.adding = true;
   todrag = (node: TodoItemFlatNode) => node.isdraged = true;
   toload = (node: TodoItemFlatNode) => !node.isLoading;
-
+  isCalled = (node: TodoItemFlatNode) => node.called = true;
   //might  be  used
   isRoot = (node: TodoItemFlatNode) => node.isRoot = true;
   /**
@@ -176,6 +184,7 @@ export class TreeWithCheckBoxComponent {
     flatNode.id = node.id;
     flatNode.name = node.name;
     flatNode.level = level;
+    debugger
     if (flatNode.level === 0) {
 
       flatNode.isRoot = true;
@@ -187,10 +196,7 @@ export class TreeWithCheckBoxComponent {
     /**
      * 
      * 
-     * 
      *      children => true yahn par ayai ga 
-     * 
-     * 
      * 
      */
 
@@ -213,6 +219,7 @@ export class TreeWithCheckBoxComponent {
     flatNode.isdraged = false;
     flatNode.adding = false;
     flatNode.isLoading = false;
+    flatNode.called = false;
     //flatNode.childChecked = false;
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
@@ -355,17 +362,12 @@ export class TreeWithCheckBoxComponent {
 
   }
 
-
-
   //this works when i click  the  save button forthe updated field
-
   getupdatedValue(node: TodoItemFlatNode, item: string) {
     debugger
     const nodenew = this.flatNodeMap.get(node);
     let id = nodenew?.id;
-
     this.treeService.updateNodeService(item, id!)
-
   }
 
   updateNodeextra(node: TodoItemFlatNode) {
@@ -476,40 +478,94 @@ export class TreeWithCheckBoxComponent {
     debugger
   }
 
+  //it fetches  the paginated  Nodes
   async fetchNode(node: TodoItemFlatNode) {
-    this.toload(node);
 
-    //let fetchID = node.id;
-    let fetchName = node.name
-    try {
-      // Fetch children using the treeService and convert Observable to Promise
-      let childs = await this.treeService.getChild(fetchName).toPromise();
-      console.log('Fetched children:', childs); // Debugging line
+    //  this.inputElement.nativeElement.value = '';
 
-      // Ensure the fetched data is an array
-      if (!Array.isArray(childs)) {
-        throw new Error('Fetched data is not an array');
+    //  checking if the  nodes called already 
+    console.log("called before if ", node.called)
+    debugger
+    if (node.called) {
+      // Mark node as processed
+
+      return;
+    }
+    //   this.isCalled(node);
+
+    console.log("called", node.called);
+
+    let fetchName = node.name;
+
+    if (this.treeControl.isExpanded(node)) {
+
+      let flatNode: TodoItemNode = this.flatNodeMap.get(node)!;
+      let length;
+      console.log(flatNode.children)
+      debugger
+      if (flatNode.children) {
+        length = flatNode.children.length;
       }
-
-      // Convert received data to TodoItemNode array
-      let mappedChildren = this.mapToTodoItemNodeArray(childs);
-
-      // Get the corresponding flatNode
-      let flatNode = this.flatNodeMap.get(node);
-
-      // Ensure flatNode exists and update its children
-      if (flatNode) {
-        flatNode.children = mappedChildren;
+      else {
+        length = 0
       }
+      if (length === 0) {
+        //  this.inputElement.nativeElement.value = '';
+        //  console.log(flatNode.children.length);
+        try {
+          // Fetch children using the treeService and convert Observable to Promise
+          let childs = await this.treeService.getChild(fetchName).toPromise();
+          console.log('Fetched children:', childs);
 
-      // Update dataSource (if necessary)
-      this.dataSource.data = [...this.dataSource.data];
+          // Ensure the fetched data is an array
+          if (!Array.isArray(childs)) {
+            throw new Error('Fetched data is not an array');
+          }
 
-    } catch (error) {
-      console.error('Error fetching node data', error);
+          // Convert received data to TodoItemNode array
+          let mappedChildren = this.mapToTodoItemNodeArray(childs);
+
+          let childlevel = node.level;
+          // Get the corresponding flatNode
+          let flatNode: TodoItemNode = this.flatNodeMap.get(node)!;
+          debugger
+          // Ensure flatNode exists and update its children
+          if (flatNode) {
+            flatNode.children = mappedChildren;
+          }
+          debugger
+
+          // for (let index = 0; index < flatNode.children.length; index++) {
+
+          //   let flatedNode: TodoItemFlatNode = {
+
+          //     id: flatNode.children[index].id,
+          //     name: flatNode.children[index].name,
+          //     level: childlevel + 1,
+          //     expandable: flatNode.children[index].status,
+          //     hasChild: flatNode.children[index].status,
+          //     updating: false,
+          //     adding: false,
+          //     isdraged: false,
+          //     isRoot: false,
+          //     isLoading: false,
+          //     childChecked: false,
+          //     called: false,
+          //   }
+          //   console.log(flatedNode);
+          //   this.treeControl.dataNodes.push(flatedNode)
+          // }
+          console.log(this.treeControl.dataNodes);
+
+          // Update dataSource (if necessary)
+          this.dataSource.data = [...this.dataSource.data];
+
+        } catch (error) {
+          console.error('Error fetching node data', error);
+        }
+      }
     }
   }
-
 
   private mapToTodoItemNodeArray(data: any[]): TodoItemNode[] {
     return data.map(item => {
@@ -527,9 +583,20 @@ export class TreeWithCheckBoxComponent {
 
   performSearch(searchTerm: string) {
     debugger
-    searchTerm = searchTerm.trim();
-    this.treeService.filterData(searchTerm)
 
+    if (searchTerm === "") {
+      this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
+
+        this.products = data.data;
+        //debugger;
+        this.dataSource.data = this.products;
+      });
+    }
+    searchTerm = searchTerm.trim();
+    let x = this.treeService.filterData(searchTerm)
+    //  console.log("cs", x);
+
+    //  this.dataSource.data =  x;
   }
   ngOnDestroy() {
     this.searchInput.complete();
@@ -540,7 +607,6 @@ export class TreeWithCheckBoxComponent {
     this.filterValue = filterX;
 
     this.searchInput.next(this.filterValue)
-
 
   }
 

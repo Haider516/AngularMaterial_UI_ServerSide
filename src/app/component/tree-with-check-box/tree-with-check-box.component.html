@@ -17,14 +17,10 @@
 
   <!-- Regular node -->
   <mat-tree-node *matTreeNodeDef="let node " matTreeNodePadding>
-    <mat-card>
-
+    <mat-card >
       <mat-card-content>
-        <!-- (click)="fetchNode(node)" -->
-
-        <!-- will be reused  -->
-
-        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item" *ngIf="node.expandable">
+        <button (click)="fetchNode(node)" mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.item"
+          *ngIf="node.expandable">
           <mat-icon class="mat-icon-rtl-mirror">
             {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
           </mat-icon>
@@ -46,16 +42,17 @@
 
         <!-- <button *ngIf="node.expandable" (click)="fetchNode(node)" style="margin-left: 10px;">load more </button> -->
 
-        <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="example-tree-progress-bar">
-        </mat-progress-bar>
+        <!-- <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="example-tree-progress-bar">
+        </mat-progress-bar> -->
 
-        <button (click)="fetchNode(node)" style="margin-left: 10px;" mat-icon-button *ngIf="node.expandable">
+        <!-- <button (click)="fetchNode(node)" ngIf style="margin-left: 10px;" mat-icon-button *ngIf="node.expandable">
           <mat-icon> unfold_more</mat-icon>
-        </button>
+        </button> -->
 
         <button style="margin-left: 10px;" mat-icon-button (click)="addNewItem(node)">
           <mat-icon>add</mat-icon>
         </button>
+
         <!--  *ngIf="(!node.expandable && !node.isRoot)" -->
         <button style="margin-left: 10px;" mat-icon-button (click)="deleteNode(node)">
           <mat-icon>delete</mat-icon>
@@ -110,17 +107,15 @@
         </mat-card>
         <!-- select option for parent End -->
 
-        <mat-card *ngIf="node.adding" class="example-card">
-          <mat-card-content>
-            <button mat-icon-button disabled></button>
-            <mat-form-field>
-              <mat-label>New item...</mat-label>
-              <input matInput #itemValue placeholder="Ex. Lettuce" />
-            </mat-form-field>
-            <app-button [color]="'warn'" [text]="'Add'" mat-button
-              (click)="saveNode(node, itemValue.value)">Save</app-button>
-          </mat-card-content>
-        </mat-card>
+        <mat-card-content *ngIf="node.adding" class="example-card">
+          <button mat-icon-button disabled></button>
+          <mat-form-field>
+            <mat-label>New item...</mat-label>
+            <input matInput #itemValue placeholder="Ex. Lettuce" />
+          </mat-form-field>
+          <app-button [color]="'warn'" [text]="'Add'" mat-button
+            (click)="saveNode(node, itemValue.value)">Save</app-button>
+        </mat-card-content>
 
       </mat-card-content>
     </mat-card>

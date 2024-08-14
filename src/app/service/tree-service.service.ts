@@ -181,9 +181,7 @@ export class TreeServiceService {
   //   );
   // }
 
-  // 
-
-
+  
   getCustomApiDataID(id: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/${id}`).pipe(
       catchError((error) => this.handleError(error))
@@ -203,14 +201,13 @@ export class TreeServiceService {
       .pipe(
         catchError((error) => this.handleError(error))
       );
-
   }
-
 
   ///tree-custom-api/:filterData
 
   filterData(filterData: string) {
 
+   
     this.getfilterTee(filterData).subscribe((players) => {
       console.log(players);
 

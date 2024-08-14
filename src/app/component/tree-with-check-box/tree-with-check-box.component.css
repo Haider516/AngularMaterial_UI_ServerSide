@@ -4,9 +4,11 @@
 
 
 .example-card {
-  border: 2px solid white;
+  padding: 5px;
 }
 
 .example-tree-progress-bar {
   margin-left: 30px;
 }
+
+
