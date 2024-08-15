@@ -38,7 +38,8 @@
         <div *ngIf="!node.expandable" class="pad">
 
         </div>
-        {{node.name}}
+        <!-- Interpolation {{node.name}}  -->
+        {{node.name}} 
 
         <!-- <button *ngIf="node.expandable" (click)="fetchNode(node)" style="margin-left: 10px;">load more </button> -->
 
@@ -76,6 +77,7 @@
               <input matInput #itemValue name="itemValue" placeholder="Ex. Lettuce" required>
             </mat-form-field>
             <!-- getupdatedValue -->
+             <!-- property Binding [text]="'Update'" -->
             <app-button matTooltip="update" [color]="'primary'" [text]="'Update'" mat-button
               (click)="getupdatedValue(node,itemValue.value)">Save</app-button>
           </mat-card-content>
@@ -91,6 +93,7 @@
               <mat-form-field appearance="fill">
                 <mat-label>Select Node TO Drop Node</mat-label>
                 <mat-select [(ngModel)]="selected" name="node">
+                  <!--  Two-way Binding:  [(ngModel)]="selected"   -->
                   <mat-option *ngFor="let option of selectOptions" [value]="option">
                     {{option.name}}
                   </mat-option>
@@ -120,5 +123,7 @@
       </mat-card-content>
     </mat-card>
   </mat-tree-node>
+
+  
 
 </mat-tree>

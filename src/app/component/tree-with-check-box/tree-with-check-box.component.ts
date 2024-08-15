@@ -193,13 +193,6 @@ export class TreeWithCheckBoxComponent {
       flatNode.isRoot = false;
     }
 
-    /**
-     * 
-     * 
-     *      children => true yahn par ayai ga 
-     * 
-     */
-
 
     //____________**********__________________
     // edit data portion
@@ -232,72 +225,72 @@ export class TreeWithCheckBoxComponent {
   }
 
 
-  /** Whether all the descendants of the node are selected. */
-  descendantsAllSelected(node: TodoItemFlatNode): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    //  debugger
-    const descAllSelected = descendants.length > 0 && descendants.every(child => {
-      return this.checklistSelection.isSelected(child);
-    });
-    return descAllSelected;
-  }
+  // /** Whether all the descendants of the node are selected. */
+  // descendantsAllSelected(node: TodoItemFlatNode): boolean {
+  //   const descendants = this.treeControl.getDescendants(node);
+  //   //  debugger
+  //   const descAllSelected = descendants.length > 0 && descendants.every(child => {
+  //     return this.checklistSelection.isSelected(child);
+  //   });
+  //   return descAllSelected;
+  // }
 
-  /** Whether part of the descendants are selected */
-  descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
-    const descendants = this.treeControl.getDescendants(node);
-    // debugger
-    const result = descendants.some(child => this.checklistSelection.isSelected(child));
-    return result && !this.descendantsAllSelected(node);
-  }
+  // /** Whether part of the descendants are selected */
+  // descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
+  //   const descendants = this.treeControl.getDescendants(node);
+  //   // debugger
+  //   const result = descendants.some(child => this.checklistSelection.isSelected(child));
+  //   return result && !this.descendantsAllSelected(node);
+  // }
 
-  /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  todoItemSelectionToggle(node: TodoItemFlatNode): void {
-    this.checklistSelection.toggle(node);
-    debugger
-    const descendants = this.treeControl.getDescendants(node);
-    this.checklistSelection.isSelected(node)
-      ? this.checklistSelection.select(...descendants)
-      : this.checklistSelection.deselect(...descendants);
-    debugger
-    // Force update for the parent
-    descendants.forEach(child => this.checklistSelection.isSelected(child));
-    this.checkAllParentsSelection(node);
-    debugger
-  }
+  // /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  // todoItemSelectionToggle(node: TodoItemFlatNode): void {
+  //   this.checklistSelection.toggle(node);
+  //   debugger
+  //   const descendants = this.treeControl.getDescendants(node);
+  //   this.checklistSelection.isSelected(node)
+  //     ? this.checklistSelection.select(...descendants)
+  //     : this.checklistSelection.deselect(...descendants);
+  //   debugger
+  //   // Force update for the parent
+  //   descendants.forEach(child => this.checklistSelection.isSelected(child));
+  //   this.checkAllParentsSelection(node);
+  //   debugger
+  // }
 
-  /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
-  todoLeafItemSelectionToggle(node: TodoItemFlatNode): void {
-    this.checklistSelection.toggle(node);
-    //  debugger
-    this.checkAllParentsSelection(node);
-  }
+  // /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
+  // todoLeafItemSelectionToggle(node: TodoItemFlatNode): void {
+  //   this.checklistSelection.toggle(node);
+  //   //  debugger
+  //   this.checkAllParentsSelection(node);
+  // }
 
-  /* Checks all the parents when a leaf node is selected/unselected */
-  checkAllParentsSelection(node: TodoItemFlatNode): void {
-    //   debugger
-    let parent: TodoItemFlatNode | null = this.getParentNode(node);
-    while (parent) {
-      this.checkRootNodeSelection(parent);
-      parent = this.getParentNode(parent);
-      debugger
-    }
-  }
+  // /* Checks all the parents when a leaf node is selected/unselected */
+  // checkAllParentsSelection(node: TodoItemFlatNode): void {
+  //   //   debugger
+  //   let parent: TodoItemFlatNode | null = this.getParentNode(node);
+  //   while (parent) {
+  //     this.checkRootNodeSelection(parent);
+  //     parent = this.getParentNode(parent);
+  //     debugger
+  //   }
+  // }
 
-  /** Check root node checked state and change it accordingly */
-  checkRootNodeSelection(node: TodoItemFlatNode): void {
-    const nodeSelected = this.checklistSelection.isSelected(node);
-    // debugger
-    const descendants = this.treeControl.getDescendants(node);
-    const descAllSelected = descendants.length > 0 && descendants.every(child => {
-      return this.checklistSelection.isSelected(child);
-    });
-    if (nodeSelected && !descAllSelected) {
-      this.checklistSelection.deselect(node);
-    } else if (!nodeSelected && descAllSelected) {
-      this.checklistSelection.select(node);
-    }
-    // debugger
-  }
+  // /** Check root node checked state and change it accordingly */
+  // checkRootNodeSelection(node: TodoItemFlatNode): void {
+  //   const nodeSelected = this.checklistSelection.isSelected(node);
+  //   // debugger
+  //   const descendants = this.treeControl.getDescendants(node);
+  //   const descAllSelected = descendants.length > 0 && descendants.every(child => {
+  //     return this.checklistSelection.isSelected(child);
+  //   });
+  //   if (nodeSelected && !descAllSelected) {
+  //     this.checklistSelection.deselect(node);
+  //   } else if (!nodeSelected && descAllSelected) {
+  //     this.checklistSelection.select(node);
+  //   }
+  //   // debugger
+  // }
 
 
   /* Get the parent node of a node */
@@ -426,8 +419,11 @@ export class TreeWithCheckBoxComponent {
 
     let newParentID = selectedflatNode?.id;
     let nodeToUpdatedID = nodeFlat?.id;
-    debugger
-    this.treeService.postioning(newParentID!, nodeToUpdatedID!);
+
+    if (newParentID && nodeToUpdatedID) {
+      this.treeService.postioning(newParentID!, nodeToUpdatedID!);
+    }
+
     //let parentNode = this.flatNodeMap.get(this.getParentNode(node)!);
     this.selectOptions = [];
     // this._database.getChanged(selectedflatNode!, nodeFlat!, parentNode!);
@@ -495,7 +491,7 @@ export class TreeWithCheckBoxComponent {
 
     console.log("called", node.called);
 
-    let fetchName = node.name;
+    let fetchName = node.id;
 
     if (this.treeControl.isExpanded(node)) {
 
@@ -583,21 +579,15 @@ export class TreeWithCheckBoxComponent {
 
   performSearch(searchTerm: string) {
     debugger
-
-    if (searchTerm === "") {
-      this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
-
-        this.products = data.data;
-        //debugger;
-        this.dataSource.data = this.products;
-      });
-    }
     searchTerm = searchTerm.trim();
-    let x = this.treeService.filterData(searchTerm)
-    //  console.log("cs", x);
-
-    //  this.dataSource.data =  x;
+    if (searchTerm.length > 1) {
+      let x = this.treeService.filterData(searchTerm)
+    }
+    else {
+      this.treeService.initialize()
+    }
   }
+
   ngOnDestroy() {
     this.searchInput.complete();
   }

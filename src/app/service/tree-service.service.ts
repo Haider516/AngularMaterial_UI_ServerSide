@@ -61,18 +61,17 @@ export class TreeServiceService {
     this.getCustomApiData().subscribe((players) => {
       this.dataChanges.next({ data: players });
     });
-
   }
 
   getCustomApiData(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:1337/api/tree-custom-api').pipe(
+    return this.http.get<any[]>('http://localhost:1337/api/tree-custom-api')
+    .pipe(
       catchError((error) => this.handleError(error)),
       map((response: any[]) => {
         return response;
       }),
     );
   }
-
 
   addNodeService(parent: Number, name: String) {
     const body = {
@@ -190,13 +189,13 @@ export class TreeServiceService {
 
   // :name
   // : Observable<any[]>
-  getChild(name: string) {
+  getChild(name: number) {
     return this.getCustomApiDataName(name).pipe(
       map((response) => response)
     );
   }
 
-  getCustomApiDataName(name: string): Observable<any[]> {
+  getCustomApiDataName(name: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${name}`)
       .pipe(
         catchError((error) => this.handleError(error))
