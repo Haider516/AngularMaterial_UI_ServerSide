@@ -1,7 +1,11 @@
 import { Injectable } from '@angular/core';
 import { PaginationMeta, PSLPlayerTree } from '../playerInterface';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
+<<<<<<< Updated upstream
 import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
+=======
+import { BehaviorSubject, catchError, map, Observable, of, throwError } from 'rxjs';
+>>>>>>> Stashed changes
 import { response } from 'express';
 
 
@@ -46,12 +50,9 @@ export class TreeServiceService {
     data: [],
   });
 
-
   get data(): { data: TodoItemNode[] } {
     return this.dataChanges.value;
   }
-
-
 
   constructor(private http: HttpClient) {
     this.initialize();
@@ -63,8 +64,10 @@ export class TreeServiceService {
     });
   }
 
+
   getCustomApiData(): Observable<any[]> {
     return this.http.get<any[]>('http://localhost:1337/api/tree-custom-api')
+<<<<<<< Updated upstream
     .pipe(
       catchError((error) => this.handleError(error)),
       map((response: any[]) => {
@@ -74,49 +77,70 @@ export class TreeServiceService {
   }
 
   addNodeService(parent: Number, name: String) {
+=======
+      .pipe(
+        catchError((error) => this.handleError(error)),
+        map((response: any[]) => {
+          return response;
+        }),
+      );
+  }
+
+  addNodeService(parent: number, name: string): Observable<any> {
+>>>>>>> Stashed changes
     const body = {
-      "data": {
-        "name": name,
-        "parent": parent
+      data: {
+        name: name,
+        parent: parent
       }
     };
     console.log("post", body);
 
-    this.http.post('http://localhost:1337/api/tree-custom-api', body)
-      .pipe(catchError((error) => this.handleError(error)))
-      .subscribe({
-        next: (response) => {
-          console.log("Post", response);
-          // Update the data change subject
-          this.getCustomApiData().subscribe((players) => {
-
-            this.dataChanges.next({ data: players });
-          });
-
-          // this.dataChanges.next(this.data);
-        },
-        error: (error) => {
-          console.error('Error posting data:', error);
-        }
-      });
+    return this.http.post('http://localhost:1337/api/tree-custom-api', body)
+      .pipe(
+        catchError((error) => {
+          //  this.handleError(error);
+          return this.handleError(error);
+        })
+      );
   }
 
+
+  // addNodeService(parent: Number, name: String) {
+  //   const body = {
+  //     "data": {
+  //       "name": name,
+  //       "parent": parent
+  //     }
+  //   };
+  //   console.log("post", body);
+
+  //   return this.http.post('http://localhost:1337/api/tree-custom-api', body)
+  //     .pipe(catchError((error) => this.handleError(error)))
+  //     .subscribe({
+  //       next: (response) => {
+  //         console.log("Post", response);
+  //         // response
+  //         // Update the data change subject
+  //         // this.getCustomApiData().subscribe((players) => {
+  //         //   this.dataChanges.next({ data: players });
+  //         // });
+  //         //  this.dataChanges.next([...this.dataChanges.data]);
+  //       },
+  //       error: (error) => {
+  //         console.error('Error posting data:', error);
+  //       }
+  //     });
+  // }
+
   deleteNodeService(id: Number) {
-    debugger
-    this.http.delete(`http://localhost:1337/api/tree-custom-api/${id}`)
-      .pipe(catchError((error) => this.handleError(error)))
-      .subscribe({
-        next: (response) => {
-          console.log("Delte", response);
-          // Update the data change subject
-          this.getCustomApiData().subscribe((players) => {
-            this.dataChanges.next({ data: players });
-          });
-        },
-        error: (error) => {
-          console.error('Error Deleting data:', error);
-        }
-      });
+    return this.http.delete(`http://localhost:1337/api/tree-custom-api/${id}`)
+      .pipe(
+        catchError((error) => {
+          //  this.handleError(error);
+          return this.handleError(error);
+        })
+      );
   }
 
   updateNodeService(name: String, id: Number) {
@@ -126,23 +150,49 @@ export class TreeServiceService {
         "parent": null
       }
     };
-    // debugger
-
-    this.http.put(`http://localhost:1337/api/tree-custom-api/${id}`, body)
-      .pipe(catchError((error) => this.handleError(error)))
-      .subscribe({
-        next: (response) => {
-          console.log("update", response);
-          // Update the data change subject
-          this.getCustomApiData().subscribe((players) => {
-            this.dataChanges.next({ data: players });
-          });
-        },
-        error: (error) => {
-          console.error('Error Updating NOde :', error);
-        }
-      });
+    return this.http.put(`http://localhost:1337/api/tree-custom-api/${id}`, body)
+      .pipe(
+        catchError((error) => {
+          //  this.handleError(error);
+          return this.handleError(error);
+        })
+      );
   }
+
+  updateSelectorOptions(id: Number) { 
+    return this.http.get(`http://localhost:1337/api/tree-custom-api/postionData/${id}`)
+      .pipe(
+        catchError((error) => {
+          //  this.handleError(error);
+          return this.handleError(error);
+        })
+      );
+  }
+
+  // updateNodeService(name: String, id: Number) {
+  //   const body = {
+  //     "data": {
+  //       "name": name,
+  //       "parent": null
+  //     }
+  //   };
+  //   // 
+
+  //   this.http.put(`http://localhost:1337/api/tree-custom-api/${id}`, body)
+  //     .pipe(catchError((error) => this.handleError(error)))
+  //     .subscribe({
+  //       next: (response) => {
+  //         console.log("update", response);
+  //         // Update the data change subject
+  //         this.getCustomApiData().subscribe((players) => {
+  //           this.dataChanges.next({ data: players });
+  //         });
+  //       },
+  //       error: (error) => {
+  //         console.error('Error Updating NOde :', error);
+  //       }
+  //     });
+  // }
 
   postioning(newParentID: Number, nodeToUpdatedID: Number) {
 
@@ -151,23 +201,16 @@ export class TreeServiceService {
         "parent": newParentID
       }
     };
-    debugger
 
-    this.http.put(`http://localhost:1337/api/tree-custom-api/postion/${nodeToUpdatedID}`, body)
-      .pipe(catchError((error) => this.handleError(error)))
-      .subscribe({
-        next: (response) => {
-          console.log("update", response);
-          // Update the data change subject
-          this.getCustomApiData().subscribe((players) => {
-            this.dataChanges.next({ data: players });
-          });
-        },
-        error: (error) => {
-          console.error('Error Updating NOde :', error);
-        }
-      });
-    debugger
+
+    return this.http.put(`http://localhost:1337/api/tree-custom-api/postion/${nodeToUpdatedID}`, body)
+    .pipe(
+      catchError((error) => {
+        //  this.handleError(error);
+        return this.handleError(error);
+      })
+    );
+
   }
 
 
@@ -180,7 +223,11 @@ export class TreeServiceService {
   //   );
   // }
 
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   getCustomApiDataID(id: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/${id}`).pipe(
       catchError((error) => this.handleError(error))
@@ -195,8 +242,13 @@ export class TreeServiceService {
     );
   }
 
+<<<<<<< Updated upstream
   getCustomApiDataName(name: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${name}`)
+=======
+  getCustomApiDataName(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${id}`)
+>>>>>>> Stashed changes
       .pipe(
         catchError((error) => this.handleError(error))
       );
@@ -205,6 +257,7 @@ export class TreeServiceService {
   ///tree-custom-api/:filterData
 
   filterData(filterData: string) {
+<<<<<<< Updated upstream
 
    
     this.getfilterTee(filterData).subscribe((players) => {
@@ -215,6 +268,12 @@ export class TreeServiceService {
     debugger
 
 
+=======
+    this.getfilterTee(filterData).subscribe((players) => {
+      console.log(players);
+      this.dataChanges.next({ data: players });
+    });
+>>>>>>> Stashed changes
   }
 
   getfilterTee(filterData: string): Observable<any[]> {
@@ -247,7 +306,7 @@ export class TreeServiceService {
 //           ...player
 
 //         }));
-//         debugger
+//
 //         const pagination = response.meta.pagination;
 //         return { players, pagination };
 //       })
