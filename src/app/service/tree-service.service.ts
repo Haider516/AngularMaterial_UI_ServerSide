@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PaginationMeta, PSLPlayerTree } from '../playerInterface';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
-<<<<<<< Updated upstream
-import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
-=======
 import { BehaviorSubject, catchError, map, Observable, of, throwError } from 'rxjs';
->>>>>>> Stashed changes
 import { response } from 'express';
 
 
@@ -67,17 +63,6 @@ export class TreeServiceService {
 
   getCustomApiData(): Observable<any[]> {
     return this.http.get<any[]>('http://localhost:1337/api/tree-custom-api')
-<<<<<<< Updated upstream
-    .pipe(
-      catchError((error) => this.handleError(error)),
-      map((response: any[]) => {
-        return response;
-      }),
-    );
-  }
-
-  addNodeService(parent: Number, name: String) {
-=======
       .pipe(
         catchError((error) => this.handleError(error)),
         map((response: any[]) => {
@@ -87,7 +72,6 @@ export class TreeServiceService {
   }
 
   addNodeService(parent: number, name: string): Observable<any> {
->>>>>>> Stashed changes
     const body = {
       data: {
         name: name,
@@ -223,11 +207,6 @@ export class TreeServiceService {
   //   );
   // }
 
-<<<<<<< Updated upstream
-  
-=======
-
->>>>>>> Stashed changes
   getCustomApiDataID(id: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/${id}`).pipe(
       catchError((error) => this.handleError(error))
@@ -242,13 +221,8 @@ export class TreeServiceService {
     );
   }
 
-<<<<<<< Updated upstream
-  getCustomApiDataName(name: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${name}`)
-=======
   getCustomApiDataName(id: number): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:1337/api/tree-custom-api/withname/${id}`)
->>>>>>> Stashed changes
       .pipe(
         catchError((error) => this.handleError(error))
       );
@@ -257,23 +231,10 @@ export class TreeServiceService {
   ///tree-custom-api/:filterData
 
   filterData(filterData: string) {
-<<<<<<< Updated upstream
-
-   
-    this.getfilterTee(filterData).subscribe((players) => {
-      console.log(players);
-
-      this.dataChanges.next({ data: players });
-    });
-    debugger
-
-
-=======
     this.getfilterTee(filterData).subscribe((players) => {
       console.log(players);
       this.dataChanges.next({ data: players });
     });
->>>>>>> Stashed changes
   }
 
   getfilterTee(filterData: string): Observable<any[]> {

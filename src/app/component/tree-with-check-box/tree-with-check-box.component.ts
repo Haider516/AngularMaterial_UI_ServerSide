@@ -103,11 +103,8 @@ export class TreeWithCheckBoxComponent {
   //filter
   filterValue = "";
   projectState: number = 0
-<<<<<<< Updated upstream
-=======
 
   nodeStatusList: NodeStatus = {};
->>>>>>> Stashed changes
   // searchBox = document.getElementById('search');
 
   //For Search Box Filtering
@@ -140,39 +137,11 @@ export class TreeWithCheckBoxComponent {
     this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel, this.isExpandable, this.getChildren);
     this.treeControl = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-<<<<<<< Updated upstream
-    //method for data source
-    this.treeService.dataChanges.subscribe((data: { data: any[] }) => {
-
-      this.products = data.data;
-      //debugger;
-      this.dataSource.data = this.products;
-      // if (this.projectState >= 1) {
-      //   this.treeControl.expandAll()
-      // }
-      // this.projectState += 1;
-
-    });
-
-    //________ 
-
-    console.log("this.dataSource", this.dataSource);
-
-    this.searchInput
-      .pipe(debounceTime(300))
-      .subscribe((searchTerm: string) => {
-
-        // Call your search function here
-        this.performSearch(searchTerm);
-      });
-    //   debugger
-=======
 
     // Debounced search input handling
     this.searchInput.pipe(debounceTime(300)).subscribe((searchTerm: string) => {
       this.performSearch(searchTerm);
     });
->>>>>>> Stashed changes
   }
 
   ngOnInit() {
@@ -221,12 +190,9 @@ export class TreeWithCheckBoxComponent {
     flatNode.id = node.id;
     flatNode.name = node.name;
     flatNode.level = level;
-<<<<<<< Updated upstream
-=======
     flatNode.level = level;
     debugger
     flatNode.level = level;
->>>>>>> Stashed changes
     debugger
     if (flatNode.level === 0) {
 
@@ -235,11 +201,6 @@ export class TreeWithCheckBoxComponent {
     else {
       flatNode.isRoot = false;
     }
-<<<<<<< Updated upstream
-
-
-=======
->>>>>>> Stashed changes
     //____________**********__________________
     // edit data portion
     // edit this to true to make it always expandable based on length
@@ -266,84 +227,6 @@ export class TreeWithCheckBoxComponent {
     this.nestedNodeMap.set(node, flatNode);
     return flatNode;
   }
-<<<<<<< Updated upstream
-
-
-  ngOnInit() {
-    this.getRootNode();
-  }
-
-
-  // /** Whether all the descendants of the node are selected. */
-  // descendantsAllSelected(node: TodoItemFlatNode): boolean {
-  //   const descendants = this.treeControl.getDescendants(node);
-  //   //  debugger
-  //   const descAllSelected = descendants.length > 0 && descendants.every(child => {
-  //     return this.checklistSelection.isSelected(child);
-  //   });
-  //   return descAllSelected;
-  // }
-
-  // /** Whether part of the descendants are selected */
-  // descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
-  //   const descendants = this.treeControl.getDescendants(node);
-  //   // debugger
-  //   const result = descendants.some(child => this.checklistSelection.isSelected(child));
-  //   return result && !this.descendantsAllSelected(node);
-  // }
-
-  // /** Toggle the to-do item selection. Select/deselect all the descendants node */
-  // todoItemSelectionToggle(node: TodoItemFlatNode): void {
-  //   this.checklistSelection.toggle(node);
-  //   debugger
-  //   const descendants = this.treeControl.getDescendants(node);
-  //   this.checklistSelection.isSelected(node)
-  //     ? this.checklistSelection.select(...descendants)
-  //     : this.checklistSelection.deselect(...descendants);
-  //   debugger
-  //   // Force update for the parent
-  //   descendants.forEach(child => this.checklistSelection.isSelected(child));
-  //   this.checkAllParentsSelection(node);
-  //   debugger
-  // }
-
-  // /** Toggle a leaf to-do item selection. Check all the parents to see if they changed */
-  // todoLeafItemSelectionToggle(node: TodoItemFlatNode): void {
-  //   this.checklistSelection.toggle(node);
-  //   //  debugger
-  //   this.checkAllParentsSelection(node);
-  // }
-
-  // /* Checks all the parents when a leaf node is selected/unselected */
-  // checkAllParentsSelection(node: TodoItemFlatNode): void {
-  //   //   debugger
-  //   let parent: TodoItemFlatNode | null = this.getParentNode(node);
-  //   while (parent) {
-  //     this.checkRootNodeSelection(parent);
-  //     parent = this.getParentNode(parent);
-  //     debugger
-  //   }
-  // }
-
-  // /** Check root node checked state and change it accordingly */
-  // checkRootNodeSelection(node: TodoItemFlatNode): void {
-  //   const nodeSelected = this.checklistSelection.isSelected(node);
-  //   // debugger
-  //   const descendants = this.treeControl.getDescendants(node);
-  //   const descAllSelected = descendants.length > 0 && descendants.every(child => {
-  //     return this.checklistSelection.isSelected(child);
-  //   });
-  //   if (nodeSelected && !descAllSelected) {
-  //     this.checklistSelection.deselect(node);
-  //   } else if (!nodeSelected && descAllSelected) {
-  //     this.checklistSelection.select(node);
-  //   }
-  //   // debugger
-  // }
-
-
-=======
->>>>>>> Stashed changes
   /* Get the parent node of a node */
   getParentNode(node: TodoItemFlatNode): TodoItemFlatNode | null {
     const currentLevel = this.getLevel(node);
@@ -421,10 +304,12 @@ export class TreeWithCheckBoxComponent {
         let id = item.id;
         // this.treeService.deleteNodeService(id!)
         let nodenewNested = this.nestedNodeMap.get(item)
+        debugger
         this.deleteNode(nodenewNested!);
       })
     }
     else {
+      debugger
       let id = nodenew?.id;
       this.apiDeleteExtra(node!, id!)
     }
@@ -434,7 +319,7 @@ export class TreeWithCheckBoxComponent {
     this.apiDeleteExtra(node!, nodenew?.id!)
   }
 
-  //the api for deleete is called in this fucntion 
+  //the api for delete is called in this fucntion 
   apiDeleteExtra(node: TodoItemFlatNode, id: Number) {
     let receivedObj: ApiCrudResponse;
     if (id) {
@@ -445,15 +330,24 @@ export class TreeWithCheckBoxComponent {
           if (receivedObj.status) {
             // here flat is  the  parent 
             let id = receivedObj?.item?.id!;
-            // flatNode?.children.push(node);
-            //  let newFlatNode=this.f.get(receivedObj?.item)
-            let parent = this.getParentNode(node)
-            let newFlatedParent = this.flatNodeMap.get(parent!);
+
             let newFlatedNode = this.flatNodeMap.get(node!);
-            let index = newFlatedParent?.children.indexOf(newFlatedNode!)
-            newFlatedParent?.children.splice(index!, 1)
-            debugger
-            this.dataSource.data = [...this.dataSource.data];
+
+            if (node.isRoot) {
+              let index = this.dataSource.data.indexOf(newFlatedNode!)
+              this.dataSource.data.splice(index, 1)
+              this.dataSource.data = [...this.dataSource.data];
+            }
+            else {
+              let parent = this.getParentNode(node)
+              let newFlatedParent = this.flatNodeMap.get(parent!);
+
+              let index = newFlatedParent?.children.indexOf(newFlatedNode!)
+              newFlatedParent?.children.splice(index!, 1)
+              debugger
+              console.log(this.dataSource.data);
+              this.dataSource.data = [...this.dataSource.data];
+            }
           }
           else {
             console.log("message", receivedObj?.message);
@@ -468,17 +362,10 @@ export class TreeWithCheckBoxComponent {
 
   }
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   //this works when i click  the  save button forthe updated field
   getupdatedValue(node: TodoItemFlatNode, item: string) {
     const nodenew = this.flatNodeMap.get(node);
     let id = nodenew?.id;
-<<<<<<< Updated upstream
-    this.treeService.updateNodeService(item, id!)
-=======
     if (item && id) {
       let receivedObj: ApiCrudResponse;
       this.treeService.updateNodeService(item, id!).subscribe({
@@ -505,7 +392,6 @@ export class TreeWithCheckBoxComponent {
       });
 
     }
->>>>>>> Stashed changes
   }
 
   updateNodeextra(node: TodoItemFlatNode) {
@@ -543,16 +429,6 @@ export class TreeWithCheckBoxComponent {
     let nodeFlat = this.flatNodeMap.get(node);
     let newParentID = this.selected?.id;
     let nodeToUpdatedID = nodeFlat?.id;
-<<<<<<< Updated upstream
-
-    if (newParentID && nodeToUpdatedID) {
-      this.treeService.postioning(newParentID!, nodeToUpdatedID!);
-    }
-
-    //let parentNode = this.flatNodeMap.get(this.getParentNode(node)!);
-    this.selectOptions = [];
-    // this._database.getChanged(selectedflatNode!, nodeFlat!, parentNode!);
-=======
     //  debugger
     if (newParentID && nodeToUpdatedID) {
       this.treeService.postioning(newParentID!, nodeToUpdatedID!).subscribe({
@@ -560,7 +436,6 @@ export class TreeWithCheckBoxComponent {
           let receivedObj = response as ApiCrudResponse;
           debugger
           if (receivedObj?.status) {
->>>>>>> Stashed changes
 
             let nodeParent = this.getParentNode(node);
             if (nodeParent) {
@@ -574,12 +449,18 @@ export class TreeWithCheckBoxComponent {
             debugger
             let newParentNode = this.flatNodeMap.get(this.treeControl.dataNodes.find((item) => item.id === this.selected?.id)!)
             newParentNode?.children.push(nodeFlat!);
-
+            let noded=this.nestedNodeMap.get(newParentNode!)
             this.selectOptions = [];
-            this.dataSource.data = [...this.dataSource.data];
+            this.treeControl.collapse(noded!)
 
           }
 
+          if(node.isRoot){
+            let foundindex=this.dataSource.data.indexOf(nodeFlat!)
+            this.dataSource.data.splice(foundindex,1)
+          }
+
+          this.dataSource.data = [...this.dataSource.data];
         },
 
       });
@@ -623,21 +504,6 @@ export class TreeWithCheckBoxComponent {
   //it fetches  the paginated  Nodes
   async fetchNode(node: TodoItemFlatNode) {
 
-<<<<<<< Updated upstream
-    //  this.inputElement.nativeElement.value = '';
-
-    //  checking if the  nodes called already 
-    console.log("called before if ", node.called)
-    debugger
-    if (node.called) {
-      // Mark node as processed
-
-      return;
-    }
-    //   this.isCalled(node);
-
-    console.log("called", node.called);
-=======
     let nodeID = node.id
     this.nodeStatusList[nodeID] = {
       node: node,
@@ -650,23 +516,16 @@ export class TreeWithCheckBoxComponent {
       // Mark node as processed
       return;
     }
->>>>>>> Stashed changes
 
     let fetchName = node.id;
 
     if (this.treeControl.isExpanded(node)) {
 
       let flatNode: TodoItemNode = this.flatNodeMap.get(node)!;
-<<<<<<< Updated upstream
-      let length;
-      console.log(flatNode.children)
-      debugger
-=======
 
       let length;
       // console.log(flatNode.children)
 
->>>>>>> Stashed changes
       if (flatNode.children) {
         length = flatNode.children.length;
       }
@@ -692,40 +551,12 @@ export class TreeWithCheckBoxComponent {
           let childlevel = node.level;
           // Get the corresponding flatNode
           let flatNode: TodoItemNode = this.flatNodeMap.get(node)!;
-<<<<<<< Updated upstream
-          debugger
-=======
-
->>>>>>> Stashed changes
           // Ensure flatNode exists and update its children
           if (flatNode) {
             flatNode.children = mappedChildren;
           }
-<<<<<<< Updated upstream
-          debugger
-=======
 
->>>>>>> Stashed changes
 
-          // for (let index = 0; index < flatNode.children.length; index++) {
-
-          //   let flatedNode: TodoItemFlatNode = {
-
-          //     id: flatNode.children[index].id,
-          //     name: flatNode.children[index].name,
-          //     level: childlevel + 1,
-          //     expandable: flatNode.children[index].status,
-          //     hasChild: flatNode.children[index].status,
-          //     updating: false,
-          //     adding: false,
-          //     isdraged: false,
-          //     isRoot: false,
-          //     isLoading: false,
-          //     childChecked: false,
-          //     called: false,
-          //   }
-          //   console.log(flatedNode);
-          //   this.treeControl.dataNodes.push(flatedNode)
           // }
           console.log(this.treeControl.dataNodes);
 
@@ -752,11 +583,6 @@ export class TreeWithCheckBoxComponent {
 
   //This Below  are For Filtering
   performSearch(searchTerm: string) {
-<<<<<<< Updated upstream
-    debugger
-=======
-
->>>>>>> Stashed changes
     searchTerm = searchTerm.trim();
     if (searchTerm.length > 1) {
       let x = this.treeService.filterData(searchTerm)
@@ -773,19 +599,7 @@ export class TreeWithCheckBoxComponent {
   async applyFilter(event: Event) {
     const filterX = (event.target as HTMLInputElement).value;
     this.filterValue = filterX;
-<<<<<<< Updated upstream
-
-    this.searchInput.next(this.filterValue)
-
-  }
-
-}
-
-
-// transform karna ha cahnge aikparameter add   karna expandablek liya aur children  empty rakha  ha 
-=======
     this.searchInput.next(this.filterValue)
   }
 
 }
->>>>>>> Stashed changes
